@@ -29,9 +29,9 @@ const Topbar = ({ children }: childrenProps) => {
 				</div>
 				<div className="flex items-center justify-around gap-3 ">
 					{/* <div>Dashboard</div> */}
-					<div className="">
+					{/* <div className="">
 						<Link href={'/dashboard'}>Dashboard</Link>
-					</div>
+					</div> */}
 					{/* <Button variant={'secondary'}>Solana</Button> */}
 					<WalletMultiButton />
 					<ModeToggle />
@@ -50,7 +50,9 @@ const Topbar = ({ children }: childrenProps) => {
 							<DropdownMenuItem>
 								<Link href={'/profile'}>Profile</Link>
 							</DropdownMenuItem>
-							<DropdownMenuItem>Account</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Link href={'/dashboard'}>Dashboard</Link>
+							</DropdownMenuItem>
 							<DropdownMenuItem>Sign out</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
