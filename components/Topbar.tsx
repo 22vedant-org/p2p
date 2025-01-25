@@ -18,7 +18,7 @@ export type childrenProps = {
 };
 const Topbar = ({ children }: childrenProps) => {
 	return (
-		<header className="backdrop-blur-xl border rounded-lg flex items-center sticky">
+		<header className="backdrop-blur-xl border rounded-lg flex items-center sticky top-0 z-50">
 			{children}
 			<div className="flex justify-between px-4 h-14 items-center w-full ">
 				<div className="flex items-center">

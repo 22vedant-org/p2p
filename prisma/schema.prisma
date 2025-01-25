@@ -10,5 +10,174 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DEMO_DATABASE_URL")
+}
+
+model User {
+  id              String        @id @default(cuid())
+  name            String?
+  email           String        @unique
+  emailVerified   Boolean       @default(false)
+  phoneNumber     String?
+  role            String        @default("rider")
+  emailVerifiedAt DateTime?
+  companyName     String?
+  banned          Boolean       @default(false)
+  banExpiration   Int?          
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relationships
+  wallets                Wallet[]       // User can have multiple wallets
+  offeredRides           Ride[]         @relation("Driver")
+  rideRequests           RideRequest[]  // Rides requested as passenger
+  givenReviews           Review[]       @relation("Reviewer")
+  receivedReviews        Review[]       @relation("Reviewee")
+  sentTransactions       Transaction[] @relation("Payer")
+  receivedTransactions   Transaction[] @relation("Payee")
+  sessions               Session[]
+  accounts               Account[]
+  @@map("users")
+}
+
+model Session {
+  id             String @id @default(cuid()) @map("_id")
+  userId         String @unique
+  token          String
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Account {
+  id                    String    @id @default(cuid()) @map("_id")
+  userId                String    
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+
+model Wallet {
+  id              String      @id @default(cuid())
+  solanaAddress   String      @unique
+  balance         Float       @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+// Relationships
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+
+  @@map("wallets")
+}
+
+model Ride {
+  id              String      @id @default(cuid())
+  startLocation   String
+  endLocation     String
+  departureTime   DateTime
+  availableSeats  Int
+  pricePerSeat    Float
+  status          RideStatus    @default(PENDING)
+  smartContractAddress  String  @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+//  Relationships
+  driver             User          @relation("Driver", fields: [driverId], references: [id])
+  driverId           String
+  rideRequests       RideRequest[]
+  transaction        Transaction?
+  reviews            Review[]
+
+  @@map("rides")
+}
+
+model RideRequest {
+  id              String      @id @default(cuid())
+  seats           Int
+  status          RequestStatus   @default(PENDING)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  ride        Ride         @relation(fields: [rideId], references: [id])
+  rideId      String
+  passenger   User         @relation(fields: [passengerId], references: [id])
+  passengerId String
+
+  @@map("ride_requests")
+}
+
+model Transaction {
+  id                  String        @id @default(cuid())
+  amount              Float
+  solanaTransactionHash String     @unique
+  status              TransactionStatus @default(PENDING)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt 
+
+
+  // Relationships
+  ride                Ride          @relation(fields: [rideId], references: [id])
+  rideId              String        @unique
+  payer               User          @relation("Payer", fields: [payerId], references: [id])
+  payerId             String
+  payee               User          @relation("Payee", fields: [payeeId], references: [id])
+  payeeId             String
+
+  @@map("transactions")
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  rating      Int
+  comment     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  reviewer    User      @relation("Reviewer", fields: [reviewerId], references: [id])
+  reviewerId  String
+  reviewee    User      @relation("Reviewee", fields: [revieweeId], references: [id])
+  revieweeId  String
+  ride        Ride      @relation(fields: [rideId], references: [id])
+  rideId      String
+
+  @@map("reviews")
+}
+
+enum RideStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

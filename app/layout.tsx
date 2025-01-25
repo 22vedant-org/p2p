@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import AppWalletProvider from '@/components/AppWalletProvider';
+import { Toaster } from '@/components/ui/toaster';
 const geistSans = Geist({
 	variable: '--font-geist-sans',
 	subsets: ['latin'],
@@ -31,7 +32,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
@@ -49,7 +50,10 @@ export default function RootLayout({
 								<Topbar>
 									<SidebarTrigger className="absolute top-[12px] -left-[10px]"></SidebarTrigger>
 								</Topbar>
-								<main>{children}</main>
+								<main>
+									{children}
+									<Toaster />
+								</main>
 							</SidebarInset>
 						</SidebarProvider>
 					</AppWalletProvider>
