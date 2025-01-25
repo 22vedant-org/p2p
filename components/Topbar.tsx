@@ -22,8 +22,6 @@ const Topbar = ({ children }: childrenProps) => {
 			{children}
 			<div className="flex justify-between px-4 h-14 items-center w-full ">
 				<div className="flex items-center">
-					{/* <div className=""> */}
-
 					<span>Ride Shares</span>
 					{/* <Navigation size={'20px'} strokeWidth={'1px'} /> */}
 				</div>
