@@ -23,23 +23,6 @@ export default function ToAndFrom() {
 			<h1 className="text-4xl font-bold tracking-tight">
 				Commute Smart, Share the Ride.
 			</h1>
-
-			{/* <div className="flex gap-8 mb-8">
-				<button className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
-					<div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-						<Car className="w-8 h-8" />
-					</div>
-					<span className="font-semibold">Ride</span>
-				</button>
-
-				<button className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors opacity-50">
-					<div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-						<Package className="w-8 h-8" />
-					</div>
-					<span className="font-semibold">Courier</span>
-				</button>
-			</div> */}
-
 			<div className="space-y-4">
 				<div className="relative">
 					<div className="absolute left-4 top-0 bottom-0 flex flex-col items-center justify-between py-[1.125rem]">
