@@ -13,13 +13,11 @@ import {
 } from './ui/dropdown-menu';
 import Link from 'next/link';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-export type childrenProps = {
-	children: React.ReactNode;
-};
-const Topbar = ({ children }: childrenProps) => {
+// import ConnectWalletButton from './ConnectionWalletButton';
+
+const Topbar = () => {
 	return (
 		<header className="backdrop-blur-xl border rounded-lg flex items-center sticky top-0 z-50">
-			{children}
 			<div className="flex justify-between px-4 h-14 items-center w-full ">
 				<div className="flex items-center">
 					<span>Ride Shares</span>
@@ -31,7 +29,8 @@ const Topbar = ({ children }: childrenProps) => {
 						<Link href={'/dashboard'}>Dashboard</Link>
 					</div> */}
 					{/* <Button variant={'secondary'}>Solana</Button> */}
-					<WalletMultiButton />
+					{/* <WalletMultiButton /> */}
+					{/* <ConnectWalletButton /> */}
 					<ModeToggle />
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>

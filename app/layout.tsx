@@ -48,7 +48,7 @@ export default function RootLayout({
 							<AppSidebar />
 							<SidebarInset>
 								<Topbar>
-									<SidebarTrigger className="absolute top-[12px] -left-[10px]"></SidebarTrigger>
+									{/* <SidebarTrigger className="absolute top-[12px] -left-[10px]"></SidebarTrigger> */}
 								</Topbar>
 								<main>
 									{children}
