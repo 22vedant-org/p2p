@@ -3,8 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { openAPI } from 'better-auth/plugins';
 import { sendEmail } from '@/app/actions/email';
 import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
-// import prisma from './prisma';
+import prisma from './prisma';
 export const auth = betterAuth({
 	database: prismaAdapter(prisma, {
 		provider: 'postgresql',
@@ -21,6 +20,13 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		requireEmailVerification: true,
+		sendResetPassword: async ({ user, url }) => {
+			await sendEmail({
+				to: user.email,
+				subject: 'Reset your password',
+				text: `Click the link to reset your password: ${url}`,
+			});
+		},
 	},
 	emailVerification: {
 		sendOnSignUp: true,

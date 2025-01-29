@@ -1,6 +1,12 @@
 'use server';
 import sgMail from '@sendgrid/mail';
 
+const validateWorkEmail = (email: string): boolean => {
+	const personalEmail =
+		/^[^@]+@(gmail|yahoo|hotmail|outlook|aol|icloud)\.(com|net|org)$/i;
+	return !personalEmail.test(email);
+};
+
 export async function sendEmail({
 	to,
 	subject,
@@ -16,7 +22,15 @@ export async function sendEmail({
 	if (!process.env.EMAIL_FROM) {
 		throw new Error('EMAIL_FROM environment variable is not set');
 	}
-
+	// if (!validateWorkEmail) {
+	// 	console.error(
+	// 		`Invalid Email domain. Use of personal email address is strictly prohibited.`
+	// 	);
+	// 	return {
+	// 		success: false,
+	// 		message: `Please use your work email`,
+	// 	};
+	// }
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 	const message = {
@@ -29,7 +43,6 @@ export async function sendEmail({
 	try {
 		const [response] = await sgMail.send(message);
 
-		console.log(response.body);
 		if (response.statusCode !== 202) {
 			throw new Error(
 				`SendGrid API returned status code ${response.statusCode}`

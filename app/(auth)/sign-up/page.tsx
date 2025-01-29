@@ -1,6 +1,12 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from '@/components/ui/card';
 import {
 	Form,
 	FormControl,
@@ -69,61 +75,101 @@ export default function SignUp() {
 
 	return (
 		<div className="grow flex items-center justify-center p-4">
-			<Card className="w-full max-w-md">
+			<Card className='w-[50%] max-w-md"'>
 				<CardHeader>
-					<CardTitle className="text-3xl font-bold text-center">
+					<h2 className="text-2xl font-bold text-center">
 						Create Account
-					</CardTitle>
+					</h2>
 				</CardHeader>
 				<CardContent>
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
-							className="space-y-6"
+							className="space-y-8"
 						>
-							{[
-								'name',
-								'email',
-								'password',
-								'confirmPassword',
-							].map((field) => (
-								<FormField
-									control={form.control}
-									key={field}
-									name={
-										field as keyof z.infer<
-											typeof signUpSchema
-										>
-									}
-									render={({ field: fieldProps }) => (
-										<FormItem>
-											<FormLabel>
-												{field.charAt(0).toUpperCase() +
-													field.slice(1)}
-											</FormLabel>
-											<FormControl>
-												<Input
-													type={
-														field.includes(
-															'password'
-														)
-															? 'password'
-															: field === 'email'
-															? 'email'
-															: 'text'
-													}
-													placeholder={`Enter your ${field}`}
-													{...fieldProps}
-													autoComplete="off"
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							))}
+							<FormField
+								control={form.control}
+								name="name"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Name</FormLabel>
+										<FormControl>
+											<Input
+												placeholder="John Doe"
+												{...field}
+											/>
+										</FormControl>
+										{/* <FormDescription>
+											This is your public display name.
+										</FormDescription> */}
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Email</FormLabel>
+										<FormControl>
+											<Input
+												type="email"
+												placeholder="john@example.com"
+												{...field}
+											/>
+										</FormControl>
+										{/* <FormDescription>
+											We'll never share your email with
+											anyone else.
+										</FormDescription> */}
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="password"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Password</FormLabel>
+										<FormControl>
+											<Input
+												type="password"
+												placeholder="Password"
+												{...field}
+											/>
+										</FormControl>
+										{/* <FormDescription>
+											Your password must be at least 8
+											characters long.
+										</FormDescription> */}
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="confirmPassword"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Confirm Password</FormLabel>
+										<FormControl>
+											<Input
+												type="password"
+												placeholder="Confirm Password"
+												{...field}
+											/>
+										</FormControl>
+										{/* <FormDescription>
+											Please confirm your password.
+										</FormDescription> */}
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<LoadingButton pending={pending}>
-								Sign up
+								Sign Up
 							</LoadingButton>
 						</form>
 					</Form>
@@ -132,10 +178,13 @@ export default function SignUp() {
 							href="/sign-in"
 							className="text-primary hover:underline"
 						>
-							Already have an account? Sign in
+							Already have an account?
 						</Link>
 					</div>
 				</CardContent>
+				{/* <CardFooter className="text-center">
+					<Link href={'/sign-in'}>Already have an account? </Link>
+				</CardFooter> */}
 			</Card>
 		</div>
 	);

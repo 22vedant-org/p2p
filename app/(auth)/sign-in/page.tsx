@@ -18,18 +18,16 @@ import { z } from 'zod';
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
+// import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-
 import { ErrorContext } from '@better-fetch/fetch';
-import { GithubIcon } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
 
 export default function SignIn() {
 	const router = useRouter();
 	const { toast } = useToast();
 	const [pendingCredentials, setPendingCredentials] = useState(false);
-	const [pendingGithub, setPendingGithub] = useState(false);
 
 	const form = useForm<z.infer<typeof signInSchema>>({
 		resolver: zodResolver(signInSchema),
@@ -69,37 +67,11 @@ export default function SignIn() {
 		setPendingCredentials(false);
 	};
 
-	const handleSignInWithGithub = async () => {
-		await authClient.signIn.social(
-			{
-				provider: 'github',
-			},
-			{
-				onRequest: () => {
-					setPendingGithub(true);
-				},
-				onSuccess: async () => {
-					router.push('/');
-					router.refresh();
-				},
-				onError: (ctx: ErrorContext) => {
-					toast({
-						title: 'Something went wrong',
-						description:
-							ctx.error.message ?? 'Something went wrong.',
-						variant: 'destructive',
-					});
-				},
-			}
-		);
-		setPendingGithub(false);
-	};
-
 	return (
 		<div className="grow flex items-center justify-center p-4">
 			<Card className="w-full max-w-md">
 				<CardHeader>
-					<CardTitle className="text-3xl font-bold text-center text-gray-800">
+					<CardTitle className="text-3xl font-bold text-center">
 						Sign In
 					</CardTitle>
 				</CardHeader>
@@ -111,63 +83,66 @@ export default function SignIn() {
 							)}
 							className="space-y-6"
 						>
-							{['email', 'password'].map((field) => (
-								<FormField
-									control={form.control}
-									key={field}
-									name={
-										field as keyof z.infer<
-											typeof signInSchema
-										>
-									}
-									render={({ field: fieldProps }) => (
-										<FormItem>
-											<FormLabel>
-												{field.charAt(0).toUpperCase() +
-													field.slice(1)}
-											</FormLabel>
-											<FormControl>
-												<Input
-													type={
-														field === 'password'
-															? 'password'
-															: 'email'
-													}
-													placeholder={`Enter your ${field}`}
-													{...fieldProps}
-													autoComplete={
-														field === 'password'
-															? 'current-password'
-															: 'email'
-													}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							))}
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Email</FormLabel>
+										<FormControl>
+											<Input
+												type="email"
+												placeholder="john@example.com"
+												{...field}
+											/>
+										</FormControl>
+										{/* <FormDescription>
+											We'll never share your email with
+											anyone else.
+										</FormDescription> */}
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="password"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Password</FormLabel>
+										<FormControl>
+											<Input
+												type="password"
+												placeholder="Password"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<LoadingButton pending={pendingCredentials}>
 								Sign in
 							</LoadingButton>
 						</form>
 					</Form>
-					<div className="mt-4">
-						<LoadingButton
-							pending={pendingGithub}
-							onClick={handleSignInWithGithub}
-						>
-							<GithubIcon className="w-4 h-4 mr-2" />
-							Continue with GitHub
-						</LoadingButton>
-					</div>
-					<div className="mt-4 text-center text-sm">
-						<Link
-							href="/forgot-password"
-							className="text-primary hover:underline"
-						>
-							Forgot password?
-						</Link>
+					<div className="flex justify-between">
+						<div className="mt-4 text-center text-sm">
+							<Link
+								href="/sign-up"
+								className="text-primary hover:underline"
+							>
+								Sign up for a free account
+							</Link>
+						</div>
+						<div className="mt-4 text-center text-sm">
+							<Link
+								href="/forgot-password"
+								className="text-primary hover:underline"
+							>
+								Forgot password?
+							</Link>
+						</div>
 					</div>
 				</CardContent>
 			</Card>
