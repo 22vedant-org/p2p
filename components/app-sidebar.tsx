@@ -3,6 +3,7 @@
 import * as React from 'react';
 import {
 	AudioWaveform,
+	Lock,
 	BookOpen,
 	Bot,
 	Command,
@@ -12,6 +13,11 @@ import {
 	PieChart,
 	Settings2,
 	SquareTerminal,
+	Gauge,
+	Car,
+	Bug,
+	IndianRupee,
+	Star,
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
@@ -27,9 +33,9 @@ import {
 	SidebarTrigger,
 	useSidebar,
 } from '@/components/ui/sidebar';
-import prisma from '@/lib/prisma';
-
-// const userData = await prisma.user.findFirst
+import { authClient } from '@/lib/auth-client';
+import { Session } from '@/lib/auth';
+import { useSessionStateStore } from '@/hooks/store/useSessionStore';
 const data = {
 	user: {
 		name: 'shadcn',
@@ -58,9 +64,9 @@ const data = {
 	],
 	navMain: [
 		{
-			title: 'Playground',
+			title: 'Dashboard',
 			url: '#',
-			icon: SquareTerminal,
+			icon: Gauge,
 			isActive: true,
 			items: [
 				{
@@ -78,43 +84,54 @@ const data = {
 			],
 		},
 		{
-			title: 'Models',
+			title: 'Rides',
 			url: '#',
-			icon: Bot,
+			icon: Car,
 			items: [
 				{
-					title: 'Genesis',
+					title: 'Offer a Ride',
 					url: '#',
 				},
 				{
-					title: 'Explorer',
+					title: 'Find a Ride',
 					url: '#',
 				},
 				{
-					title: 'Quantum',
+					title: 'My Rides',
 					url: '#',
 				},
 			],
 		},
 		{
-			title: 'Documentation',
+			title: 'Payments',
 			url: '#',
-			icon: BookOpen,
+			icon: IndianRupee,
 			items: [
 				{
-					title: 'Introduction',
+					title: 'My Wallet',
 					url: '#',
 				},
 				{
-					title: 'Get Started',
+					title: 'Payment Methods',
+					url: '#',
+				},
+			],
+		},
+		{
+			title: 'Reviews',
+			url: '#',
+			icon: Star,
+			items: [
+				{
+					title: 'My Reviews',
 					url: '#',
 				},
 				{
-					title: 'Tutorials',
+					title: 'Post a Review',
 					url: '#',
 				},
 				{
-					title: 'Changelog',
+					title: 'Verify Reviews',
 					url: '#',
 				},
 			],
@@ -142,27 +159,42 @@ const data = {
 				},
 			],
 		},
-	],
-	projects: [
 		{
-			name: 'Design Engineering',
+			title: 'Bugs',
 			url: '#',
-			icon: Frame,
-		},
-		{
-			name: 'Sales & Marketing',
-			url: '#',
-			icon: PieChart,
-		},
-		{
-			name: 'Travel',
-			url: '#',
-			icon: Map,
+			icon: Bug,
+			items: [
+				{
+					title: 'Report a bug',
+					url: '#',
+				},
+			],
 		},
 	],
+	// projects: [
+	// 	{
+	// 		name: 'Design Engineering',
+	// 		url: '#',
+	// 		icon: Frame,
+	// 	},
+	// 	{
+	// 		name: 'Sales & Marketing',
+	// 		url: '#',
+	// 		icon: PieChart,
+	// 	},
+	// 	{
+	// 		name: 'Travel',
+	// 		url: '#',
+	// 		icon: Map,
+	// 	},
+	// ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+	session: Session | null;
+}
+
+export function AppSidebar({ session, ...props }: AppSidebarProps) {
 	const { open } = useSidebar();
 	return (
 		<Sidebar collapsible="icon" {...props}>
@@ -175,7 +207,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={data.navMain} />
-				<NavProjects projects={data.projects} />
+				{/* <NavProjects projects={data.projects} /> */}
 			</SidebarContent>
 			<SidebarFooter>
 				{/* {sidebarStatus === 'false' ? <SidebarTrigger /> : null} */}

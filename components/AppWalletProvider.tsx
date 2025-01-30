@@ -8,7 +8,7 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
 import {
-	UnsafeBurnerWalletAdapter,
+	// UnsafeBurnerWalletAdapter,
 	PhantomWalletAdapter,
 	SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
@@ -22,11 +22,7 @@ const AppWalletProvider = ({ children }: AppWalletProviderProps) => {
 	const network = WalletAdapterNetwork.Devnet;
 	const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 	const wallets = useMemo(
-		() => [
-			// new UnsafeBurnerWalletAdapter(),
-			// new PhantomWalletAdapter(),
-			// new SolflareWalletAdapter(),
-		],
+		() => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
 		[network]
 	);
 	return (
