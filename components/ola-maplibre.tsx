@@ -5,14 +5,17 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import axios from 'axios';
 import polyline from '@mapbox/polyline';
 import { Feature, LineString } from 'geojson';
+import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 
 const OlaMaplibre = () => {
 	const mapRef = useRef<HTMLDivElement>(null);
 	const mapInstance = useRef<Map | null>(null); // Reference to the map instance
+	const { markerOrigin } = useMarkerPositionsStore();
 	const [markerPositions, setMarkerPositions] = useState({
 		markerOrigin: { lng: 73.847466, lat: 18.530823 },
 		markerDestination: { lng: 73.8547, lat: 18.4655 },
 	});
+
 	const [polyCords, setPolyCords] = useState<[number, number][]>([]);
 
 	const sendParamsOla = useCallback(

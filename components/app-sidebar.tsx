@@ -24,14 +24,20 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 	SidebarRail,
+	SidebarTrigger,
+	useSidebar,
 } from '@/components/ui/sidebar';
+import prisma from '@/lib/prisma';
 
-// This is sample data.
+// const userData = await prisma.user.findFirst
 const data = {
 	user: {
 		name: 'shadcn',
+		//from session data
 		email: 'm@example.com',
+		//from session data
 		avatar: '/avatars/shadcn.jpg',
+		//fetch user img either IPFS or Cloudflare object store
 	},
 	teams: [
 		{
@@ -157,16 +163,24 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const { open } = useSidebar();
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<TeamSwitcher teams={data.teams} />
+				<div className="flex items-center">
+					<TeamSwitcher teams={data.teams} />
+					{/* {sidebarStatus === 'true' ? <SidebarTrigger /> : null} */}
+					{open && <SidebarTrigger />}
+				</div>
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={data.navMain} />
 				<NavProjects projects={data.projects} />
 			</SidebarContent>
 			<SidebarFooter>
+				{/* {sidebarStatus === 'false' ? <SidebarTrigger /> : null} */}
+				{!open && <SidebarTrigger />}
+				{/* <SidebarTrigger /> */}
 				<NavUser user={data.user} />
 			</SidebarFooter>
 		</Sidebar>
