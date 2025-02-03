@@ -38,7 +38,7 @@ const Topbar = ({ session }: { session: Session | null }) => {
 		}
 	};
 	return (
-		<header className="backdrop-blur-xl border rounded-lg flex items-center sticky top-0 z-50">
+		<header className=" backdrop-blur-sm border rounded-lg flex items-center sticky top-0 z-50">
 			<div className="flex justify-between px-4 h-14 items-center w-full ">
 				<div className="flex items-center">
 					<span>Ride Shares</span>

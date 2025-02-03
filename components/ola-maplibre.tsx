@@ -10,41 +10,50 @@ import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 const OlaMaplibre = () => {
 	const mapRef = useRef<HTMLDivElement>(null);
 	const mapInstance = useRef<Map | null>(null); // Reference to the map instance
-	const { markerOrigin } = useMarkerPositionsStore();
-	const [markerPositions, setMarkerPositions] = useState({
-		markerOrigin: { lng: 73.847466, lat: 18.530823 },
-		markerDestination: { lng: 73.8547, lat: 18.4655 },
-	});
+	const originMarkerRef = useRef<Marker | null>(null);
+	const destinationMarkerRef = useRef<Marker | null>(null);
+	const {
+		markerOrigin,
+		markerDestination,
+		setMarkerDestination,
+		setMarkerOrigin,
+	} = useMarkerPositionsStore();
+
+	// const [markerPositions, setMarkerPositions] = useState({
+	// 	markerOrigin: { lng: 73.847466, lat: 18.530823 },
+	// 	markerDestination: { lng: 73.8547, lat: 18.4655 },
+	// });
 
 	const [polyCords, setPolyCords] = useState<[number, number][]>([]);
 
-	const sendParamsOla = useCallback(
-		async (positions: typeof markerPositions) => {
-			try {
-				const response = await axios.post(
-					'https://api.olamaps.io/routing/v1/directions',
-					null,
-					{
-						params: {
-							api_key: process.env.NEXT_PUBLIC_OLA_API_KEY,
-							origin: `${positions.markerOrigin.lat},${positions.markerOrigin.lng}`,
-							destination: `${positions.markerDestination.lat},${positions.markerDestination.lng}`,
-						},
-					}
-				);
-				if (response.data['status'] === 'SUCCESS') {
-					const routes = response.data.routes;
-					const polyLine = routes[0].overview_polyline;
-					const decoded = polyline.decode(polyLine);
-					setPolyCords(decoded.map(([lat, lng]) => [lng, lat])); // Reverse coordinates for GeoJSON
+	const sendParamsOla = useCallback(async () => {
+		try {
+			const response = await axios.post(
+				'https://api.olamaps.io/routing/v1/directions',
+				null,
+				{
+					params: {
+						api_key: process.env.NEXT_PUBLIC_OLA_API_KEY,
+						origin: `${markerOrigin.lat},${markerOrigin.lng}`,
+						destination: `${markerDestination.lat},${markerDestination.lng}`,
+					},
 				}
-			} catch (error) {
-				console.error(error);
-				throw error;
+			);
+			if (response.data['status'] === 'SUCCESS') {
+				const routes = response.data.routes;
+				const polyLine = routes[0].overview_polyline;
+				const decoded = polyline.decode(polyLine);
+				setPolyCords(decoded.map(([lat, lng]) => [lng, lat])); // Reverse coordinates for GeoJSON
 			}
-		},
-		[]
-	);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	}, [markerOrigin, markerDestination]);
+
+	useEffect(() => {
+		sendParamsOla();
+	}, [sendParamsOla]);
 
 	// Initialize the map only once
 	useEffect(() => {
@@ -53,7 +62,7 @@ const OlaMaplibre = () => {
 		const myMap = new Map({
 			style: `https://api.olamaps.io/tiles/vector/v1/styles/default-dark-standard/style.json`,
 			container: mapRef.current,
-			center: [73.847466, 18.530823],
+			center: [markerOrigin.lng, markerOrigin.lat],
 			zoom: 15,
 			maxBounds: [
 				68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078,
@@ -72,22 +81,27 @@ const OlaMaplibre = () => {
 		mapInstance.current = myMap;
 
 		// Add origin and destination markers
-		new Marker({ draggable: false, color: 'red' })
-			.setLngLat([73.847466, 18.530823])
+		originMarkerRef.current = new Marker({
+			draggable: true,
+			color: 'red',
+		})
+			.setLngLat([markerOrigin.lng, markerOrigin.lat])
 			.addTo(myMap);
 
-		const markerDestination = new Marker({ color: 'blue', draggable: true })
-			.setLngLat([73.8547, 18.4655])
+		destinationMarkerRef.current = new Marker({
+			color: 'blue',
+			draggable: true,
+		})
+			.setLngLat([markerDestination.lng, markerDestination.lat])
 			.addTo(myMap);
 
-		markerDestination.on('dragend', async () => {
-			const lngLat = markerDestination.getLngLat();
-			const updatedPositions = {
-				...markerPositions,
-				markerDestination: { lng: lngLat.lng, lat: lngLat.lat },
-			};
-			setMarkerPositions(updatedPositions);
-			await sendParamsOla(updatedPositions); // Fetch the new route
+		originMarkerRef.current.on('dragend', () => {
+			const lngLat = originMarkerRef.current!.getLngLat();
+			setMarkerOrigin({ lng: lngLat.lng, lat: lngLat.lat });
+		});
+		destinationMarkerRef.current.on('dragend', () => {
+			const lngLat = destinationMarkerRef.current!.getLngLat();
+			setMarkerDestination({ lng: lngLat.lng, lat: lngLat.lat });
 		});
 
 		myMap.addControl(
@@ -101,7 +115,24 @@ const OlaMaplibre = () => {
 		myMap.on('style.load', () => {
 			console.log('Style loaded successfully.');
 		});
-	}, [sendParamsOla]);
+	}, []);
+
+	useEffect(() => {
+		if (originMarkerRef.current) {
+			originMarkerRef.current.setLngLat([
+				markerOrigin.lng,
+				markerOrigin.lat,
+			]);
+		}
+	}, [markerOrigin]);
+	useEffect(() => {
+		if (destinationMarkerRef.current) {
+			destinationMarkerRef.current.setLngLat([
+				markerDestination.lng,
+				markerDestination.lat,
+			]);
+		}
+	}, [markerDestination]);
 
 	// Update the polyline when `polyCords` changes
 	useEffect(() => {

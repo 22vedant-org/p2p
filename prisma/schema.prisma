@@ -103,7 +103,7 @@ model Ride {
   availableSeats  Int
   pricePerSeat    Float
   status          RideStatus    @default(PENDING)
-  smartContractAddress  String  @unique
+  smartContractAddress  String? 
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 

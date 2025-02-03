@@ -38,6 +38,10 @@ interface GeocodeResult {
 	}[];
 }
 
+const handleRideCreation = () => {
+	console.log('Hello');
+};
+
 export default function ToAndFrom() {
 	const {
 		markerOrigin,
@@ -290,8 +294,11 @@ export default function ToAndFrom() {
 				</div>
 			</div>
 
-			<Button className="w-full h-14 text-lg font-semibold rounded-lg">
-				See prices
+			<Button
+				className="w-full h-14 text-lg font-semibold rounded-lg"
+				onClick={handleRideCreation}
+			>
+				Create Ride
 			</Button>
 		</div>
 	);

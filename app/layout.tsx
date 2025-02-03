@@ -15,6 +15,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import TopbarPrior from '@/components/TopbarPrior';
+import Footer from '@/components/footer';
 // import { useSessionStateStore } from '@/hooks/store/useSessionStore';
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -78,6 +79,7 @@ export default async function RootLayout({
 							<main>
 								{children}
 								<Toaster />
+								<Footer />
 							</main>
 						</div>
 					</ThemeProvider>

@@ -75,7 +75,7 @@ export default function SignUp() {
 
 	return (
 		<div className="grow flex items-center justify-center p-4">
-			<Card className='w-[50%] max-w-md"'>
+			<Card className="w-[50%] max-w-md">
 				<CardHeader>
 					<h2 className="text-2xl font-bold text-center">
 						Create Account
