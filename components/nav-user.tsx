@@ -42,9 +42,6 @@ export function NavUser({
 	const { isMobile } = useSidebar();
 	const { data } = authClient.useSession();
 	const session = data;
-	useEffect(() => {
-		console.log(session);
-	}, []);
 
 	// const session = useSessionStateStore((state) => state.session);
 	// useEffect(() => {
