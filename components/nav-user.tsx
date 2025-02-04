@@ -42,9 +42,6 @@ export function NavUser({
 	const { isMobile } = useSidebar();
 	const { data } = authClient.useSession();
 	const session = data;
-	useEffect(() => {
-		console.log(session);
-	}, []);
 
 	// const session = useSessionStateStore((state) => state.session);
 	// useEffect(() => {
@@ -107,7 +104,7 @@ export function NavUser({
 										}
 									/>
 									<AvatarFallback className="rounded-lg">
-										CN
+										{session?.user.name?.charAt(0)}
 									</AvatarFallback>
 								</Avatar>
 								<div className="grid flex-1 text-left text-sm leading-tight">

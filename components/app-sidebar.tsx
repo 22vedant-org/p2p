@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import * as React from 'react';
@@ -65,21 +66,21 @@ const data = {
 	navMain: [
 		{
 			title: 'Dashboard',
-			url: '#',
+			url: '/dashboard',
 			icon: Gauge,
 			isActive: true,
 			items: [
 				{
 					title: 'History',
-					url: '#',
+					url: 'dashboard/#history',
 				},
 				{
 					title: 'Starred',
-					url: '#',
+					url: 'dashboard/#starred',
 				},
 				{
 					title: 'Settings',
-					url: '#',
+					url: 'dashboard/#settings',
 				},
 			],
 		},
@@ -94,11 +95,11 @@ const data = {
 				},
 				{
 					title: 'Find a Ride',
-					url: '#',
+					url: '',
 				},
 				{
-					title: 'My Rides',
-					url: '#',
+					title: 'Ride History',
+					url: '/profile/#history',
 				},
 			],
 		},
@@ -109,11 +110,11 @@ const data = {
 			items: [
 				{
 					title: 'My Wallet',
-					url: '#',
+					url: '/wallet',
 				},
 				{
 					title: 'Payment Methods',
-					url: '#',
+					url: '/wallet/#preferences',
 				},
 			],
 		},
@@ -124,15 +125,15 @@ const data = {
 			items: [
 				{
 					title: 'My Reviews',
-					url: '#',
+					url: '/reviews',
 				},
 				{
 					title: 'Post a Review',
-					url: '#',
+					url: '/reviews/#post',
 				},
 				{
 					title: 'Verify Reviews',
-					url: '#',
+					url: '#/reviews/#verify',
 				},
 			],
 		},
@@ -143,19 +144,15 @@ const data = {
 			items: [
 				{
 					title: 'General',
-					url: '#',
+					url: '/settings/#general',
 				},
 				{
 					title: 'Team',
-					url: '#',
+					url: '/settings/#teams',
 				},
 				{
 					title: 'Billing',
-					url: '#',
-				},
-				{
-					title: 'Limits',
-					url: '#',
+					url: '/settings/#billing',
 				},
 			],
 		},
@@ -166,28 +163,11 @@ const data = {
 			items: [
 				{
 					title: 'Report a bug',
-					url: '#',
+					url: '/bug-report',
 				},
 			],
 		},
 	],
-	// projects: [
-	// 	{
-	// 		name: 'Design Engineering',
-	// 		url: '#',
-	// 		icon: Frame,
-	// 	},
-	// 	{
-	// 		name: 'Sales & Marketing',
-	// 		url: '#',
-	// 		icon: PieChart,
-	// 	},
-	// 	{
-	// 		name: 'Travel',
-	// 		url: '#',
-	// 		icon: Map,
-	// 	},
-	// ],
 };
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {

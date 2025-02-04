@@ -41,3 +41,5 @@ export const resetPasswordSchema = object({
 	message: "Passwords don't match",
 	path: ['confirmPassword'],
 });
+
+export const bugReportSchema = object({});
