@@ -1,5 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import localFont from 'next/font/local';
+import { Anton } from 'next/font/google';
 import { ModeToggle } from './mode-toggle';
 import { Button } from './ui/button';
 import Link from 'next/link';
@@ -19,6 +21,16 @@ import { Session } from '@/lib/auth';
 
 // import type { Data } from '@/lib/auth-client';
 import ConnectWalletButton from './ConnectionWalletButton';
+// const godber = localFont({
+// 	src: './fonts/godber-3lxoz.ttf',
+// 	variable: '--font-godber',
+// 	// weight: ['400'],
+// });
+const anton = Anton({
+	subsets: ['latin'],
+	weight: ['400'],
+	display: 'swap',
+});
 const Topbar = ({ session }: { session: Session | null }) => {
 	const router = useRouter();
 
@@ -41,7 +53,8 @@ const Topbar = ({ session }: { session: Session | null }) => {
 		<header className=" backdrop-blur-sm border rounded-lg flex items-center sticky top-0 z-50">
 			<div className="flex justify-between px-4 h-14 items-center w-full ">
 				<div className="flex items-center">
-					<span>Ride Shares</span>
+					<span className={`${anton.className}`}>Ride Shares</span>
+					{/* <span>Ride Shares</span> */}
 				</div>
 				<div className="flex items-center justify-around gap-3 ">
 					{/* <WalletMultiButton /> */}
