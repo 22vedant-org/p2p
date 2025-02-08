@@ -279,9 +279,7 @@ export default function ToAndFrom() {
 							<SelectValue placeholder="Select time" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem className="text-black" value="now">
-								Now
-							</SelectItem>
+							<SelectItem value="now">Now</SelectItem>
 							<SelectItem value="later">
 								Schedule for later
 							</SelectItem>

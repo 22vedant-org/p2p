@@ -2,7 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, Navigation } from 'lucide-react';
+import axios from 'axios';
+import { useRideMarkerPositionStore } from '@/hooks/store/useRideLocation';
+import { Navigation, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,8 +14,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import axios from 'axios';
-import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
+import { DatePicker } from './pick-date';
+import prisma from '@/lib/prisma';
+import { User, Ride } from '@prisma/client';
+
 interface Location {
 	name: string;
 	address: string;
@@ -38,17 +42,40 @@ interface GeocodeResult {
 	}[];
 }
 
-const handleRideCreation = () => {
-	console.log('Hello');
-};
+interface rideDataProps {
+	rideMarkerOrigin: string;
+	rideMarkerDestination: string;
+	departureTime: Date;
+	availableSeats: number;
+	pricePerSeat: number;
+}
+async function createRide(rideData: rideDataProps) {
+	try {
+		const response = await fetch('/api/create-ride', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(rideData),
+		});
+
+		if (!response.ok) {
+			throw new Error('Ride Creation Failed');
+		}
+		const newRide = await response.json();
+		return newRide;
+	} catch (error) {
+		console.error(error);
+	}
+}
 
 export default function ToAndFrom() {
 	const {
-		markerOrigin,
-		markerDestination,
-		setMarkerDestination,
-		setMarkerOrigin,
-	} = useMarkerPositionsStore();
+		rideMarkerOrigin,
+		rideMarkerDestination,
+		setRideMarkerDestination,
+		setRideMarkerOrigin,
+	} = useRideMarkerPositionStore();
 	const [pickupQuery, setPickupQuery] = useState('');
 	const [dropoffQuery, setDropoffQuery] = useState('');
 	const [pickupGeocodeResults, setPickupGeocodeResults] = useState<
@@ -65,6 +92,7 @@ export default function ToAndFrom() {
 	const [activeInput, setActiveInput] = useState<'pickup' | 'dropoff' | null>(
 		null
 	);
+	const [date, setDate] = useState<Date>();
 
 	const forwardGeocoding = async (
 		searchQuery: string,
@@ -138,7 +166,7 @@ export default function ToAndFrom() {
 		if (inputType === 'pickup') {
 			setSelectedPickup(location);
 			setPickupQuery(location.name);
-			setMarkerOrigin({
+			setRideMarkerOrigin({
 				lng: location.longitude,
 				lat: location.latitude,
 			});
@@ -147,7 +175,7 @@ export default function ToAndFrom() {
 		} else {
 			setSelectedDropoff(location);
 			setDropoffQuery(location.name);
-			setMarkerDestination({
+			setRideMarkerDestination({
 				lng: location.longitude,
 				lat: location.latitude,
 			});
@@ -167,7 +195,7 @@ export default function ToAndFrom() {
 						<div className="relative">
 							<Input
 								placeholder="Pickup location"
-								className="pl-12 pr-12 h-14 bg-gray-100 border-0 text-black"
+								className="pl-12 pr-12 h-14 border"
 								value={pickupQuery}
 								onChange={(e) => {
 									setPickupQuery(e.target.value);
@@ -178,7 +206,7 @@ export default function ToAndFrom() {
 							<Navigation className="w-5 h-5 absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
 						</div>
 						{activeInput === 'pickup' && loading && (
-							<div className="absolute w-full mt-1 p-2 bg-white border rounded-md shadow-lg">
+							<div className="absolute w-full mt-1 p-2  border rounded-md shadow-lg">
 								Loading...
 							</div>
 						)}
@@ -217,7 +245,7 @@ export default function ToAndFrom() {
 
 						<Input
 							placeholder="Dropoff location"
-							className="pl-12 pr-4 h-14 bg-gray-100 border-0 text-black"
+							className="pl-12 pr-4 h-14 border"
 							value={dropoffQuery}
 							onChange={(e) => {
 								setDropoffQuery(e.target.value);
@@ -265,30 +293,18 @@ export default function ToAndFrom() {
 					</div>
 				</div>
 
-				<div className="grid grid-cols-2 gap-4">
-					<Select defaultValue="today">
-						<SelectTrigger className="h-14 bg-gray-100 border-0 text-black">
-							<Calendar className="w-5 h-5 mr-2" />
-							<SelectValue placeholder="Select date" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="today">Today</SelectItem>
-							<SelectItem value="tomorrow">Tomorrow</SelectItem>
-						</SelectContent>
-					</Select>
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+					<DatePicker className="h-14" />
 
-					<Select defaultValue="now">
-						<SelectTrigger className="h-14 bg-gray-100 border-0 text-black">
-							<Clock className="w-5 h-5 mr-2" />
-							<SelectValue placeholder="Select time" />
+					<Select defaultValue="1">
+						<SelectTrigger className="h-14 border">
+							<UserRound className="w-5 h-5 mr-2" />
+							<SelectValue placeholder="number of passengers" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem className="text-black" value="now">
-								Now
-							</SelectItem>
-							<SelectItem value="later">
-								Schedule for later
-							</SelectItem>
+							<SelectItem value="1">1</SelectItem>
+							<SelectItem value="2">2</SelectItem>
+							<SelectItem value="3">3</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -296,7 +312,21 @@ export default function ToAndFrom() {
 
 			<Button
 				className="w-full h-14 text-lg font-semibold rounded-lg"
-				onClick={handleRideCreation}
+				onClick={async () => {
+					const ridedata = {
+						rideMarkerOrigin,
+						rideMarkerDestination,
+						departureTime: new Date(),
+						availableSeats: 3,
+						pricePerSeat: 40.9,
+					};
+
+					try {
+						const rides = await createRide(ridedata);
+					} catch (error) {
+						console.error(error);
+					}
+				}}
 			>
 				Create Ride
 			</Button>
