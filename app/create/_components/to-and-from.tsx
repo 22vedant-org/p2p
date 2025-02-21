@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 'use client';
 import React, { useEffect, useState } from 'react';
@@ -15,8 +14,8 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { DatePicker } from './pick-date';
-import prisma from '@/lib/prisma';
-import { User, Ride } from '@prisma/client';
+import { authClient } from '@/lib/auth-client';
+import { toast } from 'sonner';
 
 interface Location {
 	name: string;
@@ -45,29 +44,56 @@ interface GeocodeResult {
 interface rideDataProps {
 	rideMarkerOrigin: string;
 	rideMarkerDestination: string;
-	departureTime: Date;
+	departureTime: string;
 	availableSeats: number;
 	pricePerSeat: number;
 }
-async function createRide(rideData: rideDataProps) {
+async function createRide(rideData: rideDataProps, userId: string | undefined) {
+	if (!userId) {
+		toast('You must sign-in before trying to create a ride');
+		return;
+	}
+
 	try {
-		const response = await fetch('/api/create-ride', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(rideData),
+		const response = await axios.post('/api/create-ride', {
+			rideMarkerOrigin: rideData.rideMarkerOrigin,
+			rideMarkerDestination: rideData.rideMarkerDestination,
+			departureTime: rideData.departureTime,
+			availableSeats: rideData.availableSeats,
+			pricePerSeat: rideData.pricePerSeat,
+			driverId: userId,
 		});
 
-		if (!response.ok) {
+		if (!response) {
 			throw new Error('Ride Creation Failed');
 		}
-		const newRide = await response.json();
-		return newRide;
+		// const newRide = await response.json();
+		// return newRide;
+		toast('Ride is successfully created');
 	} catch (error) {
+		toast('Ride creation failed miserably!! 🤣🤣');
 		console.error(error);
 	}
 }
+
+// async function getCreateRide(user: User) {
+// 		const ridedata = {
+// 			rideMarkerOrigin: ,
+// 			rideMarkerDestination,
+// 			departureTime: new Date(),
+// 			availableSeats: 3,
+// 			pricePerSeat: 40.9,
+// 			driver: {
+// 				connect: {id: user.id}
+// 			}
+// 		};
+
+// 		try {
+// 			const rides = await createRide(ridedata);
+// 		} catch (error) {
+// 			console.error(error);
+// 		}
+// 	}
 
 export default function ToAndFrom() {
 	const {
@@ -76,6 +102,8 @@ export default function ToAndFrom() {
 		setRideMarkerDestination,
 		setRideMarkerOrigin,
 	} = useRideMarkerPositionStore();
+	const { data } = authClient.useSession();
+	const session = data;
 	const [pickupQuery, setPickupQuery] = useState('');
 	const [dropoffQuery, setDropoffQuery] = useState('');
 	const [pickupGeocodeResults, setPickupGeocodeResults] = useState<
@@ -92,7 +120,6 @@ export default function ToAndFrom() {
 	const [activeInput, setActiveInput] = useState<'pickup' | 'dropoff' | null>(
 		null
 	);
-	const [date, setDate] = useState<Date>();
 
 	const forwardGeocoding = async (
 		searchQuery: string,
@@ -313,18 +340,27 @@ export default function ToAndFrom() {
 			<Button
 				className="w-full h-14 text-lg font-semibold rounded-lg"
 				onClick={async () => {
-					const ridedata = {
-						rideMarkerOrigin,
-						rideMarkerDestination,
-						departureTime: new Date(),
+					const rideData: rideDataProps = {
+						rideMarkerOrigin:
+							rideMarkerOrigin.lat.toString() +
+							', ' +
+							rideMarkerOrigin.lng.toString(),
+						rideMarkerDestination:
+							rideMarkerDestination.lat.toString() +
+							', ' +
+							rideMarkerDestination.lng.toString(),
 						availableSeats: 3,
-						pricePerSeat: 40.9,
+						departureTime: Date().toString(),
+						pricePerSeat: 123,
 					};
 
 					try {
-						const rides = await createRide(ridedata);
+						const rides = await createRide(
+							rideData,
+							session?.user.id
+						);
 					} catch (error) {
-						console.error(error);
+						console.error('This is the error', error);
 					}
 				}}
 			>
