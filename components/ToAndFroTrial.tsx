@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, Navigation } from 'lucide-react';

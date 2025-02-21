@@ -31,6 +31,7 @@ model User {
   // Relationships
   wallets                Wallet[]       // User can have multiple wallets
   offeredRides           Ride[]         @relation("Driver")
+
   rideRequests           RideRequest[]  // Rides requested as passenger
   givenReviews           Review[]       @relation("Reviewer")
   receivedReviews        Review[]       @relation("Reviewee")
@@ -99,7 +100,7 @@ model Ride {
   id              String      @id @default(cuid())
   startLocation   String
   endLocation     String
-  departureTime   DateTime
+  departureTime   String
   availableSeats  Int
   pricePerSeat    Float
   status          RideStatus    @default(PENDING)
@@ -108,8 +109,8 @@ model Ride {
   updatedAt       DateTime      @updatedAt
 
 //  Relationships
-  driver             User          @relation("Driver", fields: [driverId], references: [id])
   driverId           String
+  driver             User          @relation("Driver", fields: [driverId], references: [id])
   rideRequests       RideRequest[]
   transaction        Transaction?
   reviews            Review[]

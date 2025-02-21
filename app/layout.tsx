@@ -74,12 +74,12 @@ export default async function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<div>
+						<div className="min-h-screen flex flex-col">
 							<TopbarPrior />
 							<main>
 								{children}
-								<Toaster />
 								<Footer />
+								<Toaster />
 							</main>
 						</div>
 					</ThemeProvider>
