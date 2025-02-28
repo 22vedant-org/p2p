@@ -60,7 +60,7 @@ const OlaMaplibre = () => {
 		if (!mapRef.current || mapInstance.current) return;
 
 		const myMap = new Map({
-			style: `https://api.olamaps.io/tiles/vector/v1/styles/default-dark-standard/style.json`,
+			style: `https://api.olamaps.io/styleEditor/v1/styleEdit/styles/923b4afc-f3f9-4d83-8c65-c2eb598f5834/ola-mapbox-dark-copy`,
 			container: mapRef.current,
 			center: [markerOrigin.lng, markerOrigin.lat],
 			zoom: 15,

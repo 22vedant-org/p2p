@@ -6,14 +6,17 @@ import { headers } from 'next/headers';
 export async function POST(req: NextRequest) {
 	try {
 		// ✅ Get user session (Uncomment if needed)
-		// const session = await auth.api.getSession({
-		//   headers: await headers(),
-		// });
+		const session = await auth.api.getSession({
+			headers: await headers(),
+		});
 
 		// ✅ Ensure user is authenticated (Uncomment if needed)
-		// if (!session?.user?.id) {
-		//   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-		// }
+		if (!session?.user?.id) {
+			return NextResponse.json(
+				{ error: 'Unauthorized' },
+				{ status: 401 }
+			);
+		}
 
 		// ✅ Parse request body safely
 		let body;
