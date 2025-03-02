@@ -6,7 +6,7 @@ const Footer = () => {
 				<span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
 					© 2025{' '}
 					<Link
-						href="http://22vedant.online/"
+						href="https://github.com/22vedant"
 						className="hover:underline"
 					>
 						22vedant
