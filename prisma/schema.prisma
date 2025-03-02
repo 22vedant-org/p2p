@@ -21,10 +21,10 @@ model User {
   emailVerified   Boolean       @default(false)
   phoneNumber     String?
   role            String        @default("rider")
-  emailVerifiedAt DateTime?
+  // emailVerifiedAt DateTime?
   companyName     String?
   banned          Boolean       @default(false)
-  banExpiration   Int?          
+  // banExpiration   Int?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
