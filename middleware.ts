@@ -30,7 +30,14 @@ export default async function authMiddleware(request: NextRequest) {
 		if (isAuthRoute || isPasswordRoute || isPublicRoute) {
 			return NextResponse.next();
 		}
-		return NextResponse.redirect(new URL('/landing', request.url));
+
+		const currentPath = new URL(request.url).pathname;
+
+		if (pathName === '/' && currentPath !== '/landing') {
+			return NextResponse.redirect(new URL('/landing', request.url));
+		} else if (pathName !== currentPath) {
+			return NextResponse.redirect(new URL(pathName, request.url));
+		}
 	}
 
 	if (isAuthRoute || isPasswordRoute) {
