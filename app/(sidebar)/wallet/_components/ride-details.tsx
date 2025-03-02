@@ -35,14 +35,14 @@ export function RideDetails() {
 	}
 
 	return (
-		<Card className="col-span-1">
+		<Card className="col-span-1 overflow-scroll">
 			<CardHeader>
 				<CardTitle>Ride Details</CardTitle>
 				<CardDescription>
 					Your upcoming and recent rides
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="h-[300px]">
 				<Tabs defaultValue="upcoming">
 					<TabsList className="mb-4">
 						<TabsTrigger value="upcoming">Upcoming</TabsTrigger>

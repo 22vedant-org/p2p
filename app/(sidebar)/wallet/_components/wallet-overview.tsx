@@ -1,3 +1,4 @@
+'use client';
 import {
 	Card,
 	CardContent,
@@ -6,8 +7,22 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { ArrowUpRight, ArrowDownRight, Copy } from 'lucide-react';
+import { useState } from 'react';
+import { authClient } from '@/lib/auth-client';
+import { Connection, PublicKey } from '@solana/web3.js';
+
+function handleCopy() {
+	const selection = navigator.clipboard.writeText('sdfsdf');
+}
 
 export function WalletOverview() {
+	const [walletAddress, setWalletAddress] = useState('');
+	const { data } = authClient.useSession();
+	const session = data;
+
+	// if (session) {
+	// 	setWalletAddress(publicKey);
+	// }
 	return (
 		<Card className="col-span-1">
 			<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -38,7 +53,7 @@ export function WalletOverview() {
 							<span className="truncate">
 								0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t
 							</span>
-							<button className="ml-auto">
+							<button className="ml-auto" onClick={handleCopy}>
 								<Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
 							</button>
 						</div>
@@ -53,7 +68,7 @@ export function WalletOverview() {
 							Book Ride
 						</button>
 					</div>
-					<div className="mt-4 space-y-2">
+					{/* <div className="mt-4 space-y-2">
 						<div className="flex justify-between text-sm">
 							<span className="text-muted-foreground">
 								Total Distance
@@ -72,7 +87,7 @@ export function WalletOverview() {
 							</span>
 							<span className="font-medium">42</span>
 						</div>
-					</div>
+					</div> */}
 				</div>
 			</CardContent>
 		</Card>
