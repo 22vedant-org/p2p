@@ -1,6 +1,12 @@
 'use client';
 import React, { useEffect, useRef, useCallback, useState } from 'react';
-import { GeolocateControl, Map, Marker, GeoJSONSource } from 'maplibre-gl';
+import {
+	GeolocateControl,
+	Map,
+	Marker,
+	GeoJSONSource,
+	NavigationControl,
+} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import axios from 'axios';
 import polyline from '@mapbox/polyline';
@@ -60,13 +66,14 @@ const OlaMaplibre = () => {
 		if (!mapRef.current || mapInstance.current) return;
 
 		const myMap = new Map({
-			style: `https://api.olamaps.io/styleEditor/v1/styleEdit/styles/923b4afc-f3f9-4d83-8c65-c2eb598f5834/ola-mapbox-dark-copy`,
+			style: `https://api.olamaps.io/styleEditor/v1/styleEdit/styles/923b4afc-f3f9-4d83-8c65-c2eb598f5834/ola-mapbox-dark`,
 			container: mapRef.current,
 			center: [markerOrigin.lng, markerOrigin.lat],
 			zoom: 15,
 			maxBounds: [
 				68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078,
 			],
+			rollEnabled: true,
 			transformRequest: (url, resourceType) => {
 				if (url.includes('?')) {
 					url = `${url}&api_key=${process.env.NEXT_PUBLIC_OLA_API_KEY}`;
@@ -76,6 +83,15 @@ const OlaMaplibre = () => {
 				return { url, resourceType };
 			},
 		});
+
+		myMap.addControl(
+			new NavigationControl({
+				visualizePitch: true,
+				visualizeRoll: true,
+				showZoom: true,
+				showCompass: true,
+			})
+		);
 
 		// Save the map instance
 		mapInstance.current = myMap;
