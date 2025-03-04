@@ -8,7 +8,7 @@ export default function Home() {
 	return (
 		<div className="grid grid-cols-2 h-screen w-full">
 			<div className="overflow-y-scroll h-full">
-				<ToAndFrom />
+				{/* <ToAndFrom /> */}
 				<ToFrom />
 				{/* <ChooseRide /> */}
 			</div>
