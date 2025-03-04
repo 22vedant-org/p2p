@@ -91,11 +91,11 @@ const data = {
 			items: [
 				{
 					title: 'Offer a Ride',
-					url: '/create',
+					url: '/rides/create',
 				},
 				{
 					title: 'Find a Ride',
-					url: '',
+					url: '/rides/',
 				},
 				{
 					title: 'Ride History',
