@@ -46,11 +46,14 @@ export default function ProfileSettings() {
 		},
 	});
 	return (
-		<div className="min-h-screen p-6">
-			<div className="mx-auto max-w-6xl px-4 py-8 w-full">
+		<div className="grid grid-cols-1 md:grid-cols-2">
+			<div className="w-full">
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)}>
-						<div className="gap-6 grid grid-cols-1 md:grid-cols-3">
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="px-3"
+					>
+						<div className="">
 							<FormField
 								control={form.control}
 								name="name"
@@ -68,7 +71,7 @@ export default function ProfileSettings() {
 								)}
 							/>
 						</div>
-						<div className="gap-6 grid grid-cols-1 md:grid-cols-3">
+						<div className="">
 							<FormField
 								control={form.control}
 								name="image"
@@ -86,7 +89,7 @@ export default function ProfileSettings() {
 								)}
 							/>
 						</div>
-						<div className="gap-6 grid grid-cols-1 md:grid-cols-3">
+						<div className="">
 							<FormField
 								control={form.control}
 								name="phone"
@@ -104,7 +107,7 @@ export default function ProfileSettings() {
 								)}
 							/>
 						</div>
-						<div className="gap-6 grid grid-cols-1 md:grid-cols-3">
+						<div className="">
 							<FormField
 								control={form.control}
 								name="role"
@@ -141,7 +144,7 @@ export default function ProfileSettings() {
 								)}
 							/>
 						</div>
-						<div className="gap-6 grid grid-cols-1 md:grid-cols-3">
+						<div className="">
 							<FormField
 								control={form.control}
 								name="phone"
@@ -159,10 +162,11 @@ export default function ProfileSettings() {
 								)}
 							/>
 						</div>
-						<Button>Submit</Button>
+						<Button className="my-2 ">Submit</Button>
 					</form>
 				</Form>
 			</div>
+			<div className="w-full bg-pink-400">Hello</div>
 		</div>
 	);
 }

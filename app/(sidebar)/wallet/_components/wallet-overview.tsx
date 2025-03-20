@@ -7,22 +7,41 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { ArrowUpRight, ArrowDownRight, Copy } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { authClient } from '@/lib/auth-client';
-import { Connection, PublicKey } from '@solana/web3.js';
-
-function handleCopy() {
-	const selection = navigator.clipboard.writeText('sdfsdf');
-}
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { toast } from 'sonner';
 
 export function WalletOverview() {
 	const [walletAddress, setWalletAddress] = useState('');
 	const { data } = authClient.useSession();
 	const session = data;
+	const { connection } = useConnection();
+	const { publicKey } = useWallet();
 
-	// if (session) {
-	// 	setWalletAddress(publicKey);
-	// }
+	// useEffect(() => {
+	// 	setWalletAddress(
+	// 		(publicKey as NonNullable<typeof publicKey>).toBase58()
+	// 	);
+	// }, []);
+
+	async function handleCopy() {
+		if (!publicKey) {
+			toast.error('No wallet found');
+			return;
+		}
+		try {
+			await navigator.clipboard.writeText(
+				(publicKey as NonNullable<typeof publicKey>).toBase58()
+			);
+			setWalletAddress(
+				(publicKey as NonNullable<typeof publicKey>).toBase58()
+			);
+		} catch (error) {
+			toast.error('Failed to copy address');
+		}
+	}
+
 	return (
 		<Card className="col-span-1">
 			<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -39,7 +58,7 @@ export function WalletOverview() {
 						<div className="text-sm font-medium text-muted-foreground">
 							Total Ride Credits
 						</div>
-						<div className="text-3xl font-bold">345 RTC</div>
+						<div className="text-3xl font-bold">3 SOL</div>
 						<div className="flex items-center text-sm text-green-500">
 							<ArrowUpRight className="mr-1 h-4 w-4" />
 							<span>+15 credits this week</span>
@@ -50,9 +69,10 @@ export function WalletOverview() {
 							Wallet Address
 						</div>
 						<div className="flex items-center gap-2 rounded-md bg-muted p-2 text-xs font-mono">
-							<span className="truncate">
-								0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t
-							</span>
+							<span className="truncate">{walletAddress}</span>
+							{/* <span className="truncate"> */}
+							{/* {publicKey!.toBase58()} */}
+							{/* </span> */}
 							<button className="ml-auto" onClick={handleCopy}>
 								<Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
 							</button>

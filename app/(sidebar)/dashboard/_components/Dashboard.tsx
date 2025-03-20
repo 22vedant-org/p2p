@@ -1,6 +1,8 @@
 'use client';
+
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { DollarSign, TrendingUp, Ticket, Car } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
 	Select,
 	SelectContent,
@@ -8,103 +10,185 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { RecentOrder } from '@/db/dashboard';
-import { ReusableTable } from '@/components/ReusableTable';
-import { ColumnDef } from '@tanstack/react-table';
-import StatCards from './StatusCard';
-
-export interface Stat {
-	title: string;
-	value: string;
-	change: string;
-	icon: string;
-}
-
-interface DashboardProps {
-	name: string;
-	stats: Stat[];
-	recentOrders: RecentOrder[];
-}
-
-const columns: ColumnDef<RecentOrder>[] = [
-	{
-		accessorKey: 'id',
-		header: 'Order number',
-	},
-	{
-		accessorKey: 'date',
-		header: 'Purchase date',
-	},
-	{
-		accessorKey: 'customer',
-		header: 'Customer',
-	},
-	{
-		accessorKey: 'event',
-		header: 'Event',
-		cell: ({ row }) => row.original.event,
-	},
-	{
-		accessorKey: 'amount',
-		header: 'Amount',
-		cell: ({ getValue }) => getValue() as string,
-	},
-];
-
-export default function Dashboard({
-	name,
-	stats,
-	recentOrders,
-}: DashboardProps) {
-	const [timePeriod, setTimePeriod] = useState('Last week');
+import {
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableFooter,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { authClient } from '@/lib/auth-client';
+export default function Dashboard() {
+	const [timeframe, setTimeframe] = useState('last-week');
+	const { data } = authClient.useSession();
+	const session = data;
+	// Mock data - empty for this example
+	const orders = [
+		{
+			id: '100',
+			number: '001',
+			date: '23/01/2312',
+			customer: 'Bonnie',
+			event: 'Boneheads',
+			amount: '1000',
+		},
+	];
 
 	return (
-		<div className="mx-auto max-w-7xl">
-			<motion.header
-				className="flex justify-between items-center mb-8"
-				initial={{ opacity: 0, y: -20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
-			>
-				<h1 className="font-bold text-3xl text-gray-900 dark:text-gray-100">
-					Good afternoon, {name}
-				</h1>
-				<Select value={timePeriod} onValueChange={setTimePeriod}>
-					<SelectTrigger className="w-[180px]">
-						<SelectValue
-							placeholder="Select time period"
-							className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-						/>
-					</SelectTrigger>
-					<SelectContent className="bg-white dark:bg-gray-700">
-						<SelectItem
-							value="Last week"
-							className="text-gray-900 dark:text-gray-100"
-						>
-							Last week
-						</SelectItem>
-						<SelectItem
-							value="Last month"
-							className="text-gray-900 dark:text-gray-100"
-						>
-							Last month
-						</SelectItem>
-						<SelectItem
-							value="Last year"
-							className="text-gray-900 dark:text-gray-100"
-						>
-							Last year
-						</SelectItem>
-					</SelectContent>
-				</Select>
-			</motion.header>
+		<div className="flex flex-col min-h-screen">
+			<div className="flex-1 space-y-8 p-8 pt-6">
+				<div className="flex items-center justify-between">
+					<h1 className="text-3xl font-bold tracking-tight">
+						Good afternoon, {session ? session?.user.name : ''}
+					</h1>
+					<div className="flex items-center gap-2">
+						<Select value={timeframe} onValueChange={setTimeframe}>
+							<SelectTrigger className="w-[180px] bg-gray-900 border-gray-800">
+								<SelectValue placeholder="Select timeframe" />
+							</SelectTrigger>
+							<SelectContent className="bg-gray-900 border-gray-800">
+								<SelectItem value="today">Today</SelectItem>
+								<SelectItem value="yesterday">
+									Yesterday
+								</SelectItem>
+								<SelectItem value="last-week">
+									Last week
+								</SelectItem>
+								<SelectItem value="last-month">
+									Last month
+								</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+				</div>
 
-			<StatCards stats={stats} />
+				<div className="grid gap-4 md:grid-cols-3">
+					<Card className="bg-gray-900 border-gray-800 text-white">
+						<CardHeader className="flex flex-row items-center justify-between pb-2">
+							<CardTitle className="text-sm font-medium text-gray-400">
+								Total revenue
+							</CardTitle>
+							<DollarSign className="h-4 w-4 text-gray-400" />
+						</CardHeader>
+						<CardContent>
+							<div className="text-3xl font-bold">$0.00</div>
+						</CardContent>
+					</Card>
 
-			<h3 className="font-semibold text-gray-900 text-xl dark:text-gray-100">
-				Recent orders
-			</h3>
-			<ReusableTable data={recentOrders} columns={columns} />
+					<Card className="bg-gray-900 border-gray-800 text-white">
+						<CardHeader className="flex flex-row items-center justify-between pb-2">
+							<CardTitle className="text-sm font-medium text-gray-400">
+								Average order value
+							</CardTitle>
+							<TrendingUp className="h-4 w-4 text-gray-400" />
+						</CardHeader>
+						<CardContent>
+							<div className="text-3xl font-bold">$0.00</div>
+						</CardContent>
+					</Card>
+
+					<Card className="bg-gray-900 border-gray-800 ">
+						<CardHeader className="flex flex-row items-center justify-between pb-2">
+							<CardTitle className="text-sm font-medium text-gray-400">
+								Completed Rides
+							</CardTitle>
+							<Car className="h-4 w-4 text-gray-400" />
+						</CardHeader>
+						<CardContent>
+							<div className="text-3xl font-bold">0</div>
+						</CardContent>
+					</Card>
+				</div>
+
+				<div className="space-y-4">
+					<h2 className="text-2xl font-bold tracking-tight">
+						Recent orders
+					</h2>
+					<div className="rounded-md border border-gray-800 bg-gray-950">
+						<Table>
+							<TableHeader>
+								<TableRow className="border-gray-800 hover:bg-gray-900">
+									<TableHead className="text-gray-400">
+										Order number
+									</TableHead>
+									<TableHead className="text-gray-400">
+										Purchase date
+									</TableHead>
+									<TableHead className="text-gray-400">
+										Customer
+									</TableHead>
+									<TableHead className="text-gray-400">
+										Event
+									</TableHead>
+									<TableHead className="text-gray-400">
+										Amount
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{orders.length > 0 ? (
+									orders.map((order) => (
+										<TableRow
+											key={order.id}
+											className="border-gray-800 hover:bg-gray-900"
+										>
+											<TableCell>
+												{order.number}
+											</TableCell>
+											<TableCell>{order.date}</TableCell>
+											<TableCell>
+												{order.customer}
+											</TableCell>
+											<TableCell>{order.event}</TableCell>
+											<TableCell className="">
+												{order.amount}
+											</TableCell>
+										</TableRow>
+									))
+								) : (
+									<TableRow className="border-gray-800 hover:bg-gray-900">
+										<TableCell
+											colSpan={5}
+											className="h-24 text-center text-gray-400"
+										>
+											No results.
+										</TableCell>
+									</TableRow>
+								)}
+							</TableBody>
+							<TableFooter>
+								<TableRow>
+									<TableCell colSpan={4}>Total</TableCell>
+									<TableCell className="">
+										$2,500.00
+									</TableCell>
+								</TableRow>
+							</TableFooter>
+						</Table>
+					</div>
+					{/* 
+					<div className="flex items-center justify-end space-x-2 py-4">
+						<Button
+							variant="outline"
+							className="bg-transparent border-gray-800 text-gray-400 hover:bg-gray-900 hover:text-white"
+							disabled={true}
+						>
+							Previous
+						</Button>
+						<Button
+							variant="outline"
+							className="bg-transparent border-gray-800 text-gray-400 hover:bg-gray-900 hover:text-white"
+							disabled={true}
+						>
+							Next
+						</Button>
+					</div> */}
+				</div>
+			</div>
 		</div>
 	);
 }
