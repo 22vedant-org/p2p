@@ -1,5 +1,3 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
 First, start a postgres instance in Docker or grab a free PostgreSQL database instance from [Aiven](https://aiven.io/postgresql) or [Neon](https://neon.tech/)
@@ -20,7 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 For testing purposes, you can use the following credentials:
 
-```
+```bash
 email: zydova2236@dropjar.com
 password: password
 ```
