@@ -170,6 +170,21 @@ model Review {
   @@map("reviews")
 }
 
+model Bugs {
+  id    String    @id    @default(cuid())
+  Area  BugEnum
+  Title String
+  Description String
+
+}
+enum BugEnum {
+  Map
+  Dashboard
+  RideBooking
+  Payments
+  ReviewS
+  Settings
+}
 enum RideStatus {
   PENDING
   CONFIRMED

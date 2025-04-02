@@ -12,9 +12,11 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 import { DateTimePicker24hForm } from './pick-date-time';
 import { Textarea } from '@/components/ui/textarea';
+import { authClient } from '@/lib/auth-client';
 interface Location {
 	name: string;
 	address: string;
@@ -40,7 +42,18 @@ interface GeocodeResult {
 	}[];
 }
 
+interface RideBody {
+	rideMarkerOrigin: string;
+	rideMarkerDestination: string;
+	departureTime: Date;
+	availableSeats: number;
+	pricePerSeat: number;
+	driverId: string;
+}
 export default function ToFrom() {
+	const { toast } = useToast();
+	const { data } = authClient.useSession();
+	const session = data;
 	const {
 		markerOrigin,
 		markerDestination,
@@ -154,6 +167,33 @@ export default function ToFrom() {
 		}
 	};
 
+	const onCreateRide = async () => {
+		try {
+			const response = await axios.post('/create-ride', {
+				rideMarkerOrigin,
+				rideMarkerDestination,
+				departureTime,
+				availableSeats,
+				pricePerSeat: ,
+				driverId: session?.user.id,
+			});
+
+			if (response.status == 201) {
+				toast({
+					title: 'Ride Created Successfully',
+					description: 'Your ride has been added to the platform.',
+					variant: 'default',
+				});
+			}
+		} catch (error) {
+			toast({
+				title: 'Ride Creation Failed',
+				description:
+					'There was an error creating your ride. Please try again.',
+				variant: 'destructive',
+			});
+		}
+	};
 	return (
 		<div className="max-w-xl mx-auto p-6 space-y-8 overflow-y-scroll">
 			<div className="text-4xl font-bold tracking-tight">
@@ -311,8 +351,7 @@ export default function ToFrom() {
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="SOL">SOL</SelectItem>
-							<SelectItem value="BTC">USDC</SelectItem>
-							{/* <SelectItem value="ETH">ETH</SelectItem> */}
+							{/* <SelectItem value="USDC">USDC</SelectItem> */}
 						</SelectContent>
 					</Select>
 				</div>
@@ -320,7 +359,10 @@ export default function ToFrom() {
 				<Textarea placeholder="Write details related to the ride." />
 			</div>
 
-			<Button className="w-full h-14 text-lg font-semibold rounded-lg">
+			<Button
+				className="w-full h-14 text-lg font-semibold rounded-lg"
+				onClick={onCreateRide}
+			>
 				Create Ride
 			</Button>
 		</div>
