@@ -1,19 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import React from 'react';
-
-const page = () => {
+import type { Metadata } from 'next';
+import ReviewsList from './review-list';
+export default function ReviewsPage() {
 	return (
-		<div className="grow flex justify-center items-center p-4">
-			<div>Check Reviews</div>
-			<Input
-				type="text"
-				className="mr-3"
-				placeholder="Enter the user id of the driver"
-			/>
-			<Button variant={'secondary'}>Submit</Button>
+		<div className="container mx-auto py-8 px-4">
+			<h1 className="text-3xl font-bold mb-6">Reviews</h1>
+			<ReviewsList />
 		</div>
 	);
-};
-
-export default page;
+}

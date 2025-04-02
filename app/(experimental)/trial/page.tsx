@@ -45,6 +45,7 @@ export default async function Home() {
 				<h1 className="text-7xl">Hello</h1>
 				<p>You are logged in as: {session?.user?.email}</p>
 				<p>You are logged in as: {session?.user?.name}</p>
+				<p>You&apos;re session id is: {session?.user.id}</p>
 			</div>
 		</main>
 		// <div className="grow flex items-center justify-center p-4">

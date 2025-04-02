@@ -11,12 +11,12 @@ export async function POST(req: NextRequest) {
 		});
 
 		// ✅ Ensure user is authenticated (Uncomment if needed)
-		if (!session?.user?.id) {
-			return NextResponse.json(
-				{ error: 'Unauthorized' },
-				{ status: 401 }
-			);
-		}
+		// if (!session?.user?.id) {
+		// 	return NextResponse.json(
+		// 		{ error: 'Unauthorized' },
+		// 		{ status: 401 }
+		// 	);
+		// }
 
 		// ✅ Parse request body safely
 		let body;
