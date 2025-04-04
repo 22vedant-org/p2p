@@ -1,7 +1,9 @@
-import React from 'react';
+import SettingsLayout from './_components/settings-layout';
 
-const page = () => {
-	return <div>page</div>;
-};
-
-export default page;
+export default function SettingsPage() {
+	return (
+		<div className="container mx-auto py-10">
+			<SettingsLayout />
+		</div>
+	);
+}

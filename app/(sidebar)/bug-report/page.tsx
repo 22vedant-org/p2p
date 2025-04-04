@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import {
 	Card,
 	CardContent,
@@ -18,10 +19,34 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 
 // async function handleSubmit() {}
 const page = () => {
-	const handleSubmit = async () => {};
+	const [area, setArea] = useState('');
+	const [title, setTitle] = useState('');
+	const [description, setDescription] = useState('');
+	const { toast } = useToast();
+	const handleSubmit = async () => {
+		try {
+			const response = await axios.post('api/bug-report', {
+				area: area,
+				title: title,
+				description: description,
+			});
+			toast({
+				title: 'Report submitted successfully',
+				// description: ""
+			});
+		} catch (error) {
+			console.error(error);
+			toast({
+				title: 'Error',
+				description: `${error}`,
+			});
+		}
+	};
 	return (
 		<div className="grow flex items-center justify-center p-4">
 			<Card className="w-[50%] max-w-md">
@@ -35,31 +60,42 @@ const page = () => {
 					<div className="mb-2">
 						<Label>Area</Label>
 						{/* <Input></Input> */}
-						<Select>
+						<Select onValueChange={(value) => setArea(value)}>
 							<SelectTrigger>
 								<SelectValue placeholder="Select an area" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="dashboard">
+								<SelectItem value="Dashboard">
 									Dashboard
 								</SelectItem>
-								<SelectItem value="rideBooking">
+								<SelectItem value="RideBooking">
 									Ride Booking
 								</SelectItem>
-								<SelectItem value="map">Map</SelectItem>
+								<SelectItem value="Map">Map</SelectItem>
+								<SelectItem value="Payments">
+									Payments
+								</SelectItem>
+								<SelectItem value="ReviewS">Reviews</SelectItem>
+								<SelectItem value="Settings">
+									Settings
+								</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
 
 					<div className="mb-2">
 						<Label>Title</Label>
-						<Input placeholder="Briefly describe the issue" />
+						<Input
+							placeholder="Briefly describe the issue"
+							onChange={(e) => setTitle(e.target.value)}
+						/>
 					</div>
 					<div className="mb-2">
 						<Label htmlFor="description">Description</Label>
 						<Textarea
 							id="description"
 							placeholder="Describe the issue you are facing"
+							onChange={(e) => setDescription(e.target.value)}
 						/>
 					</div>
 					<Button className="w-full" onClick={handleSubmit}>
