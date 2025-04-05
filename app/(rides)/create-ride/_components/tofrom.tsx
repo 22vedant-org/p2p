@@ -2,6 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { IndianRupee, Navigation, UserRound } from 'lucide-react';
+import Solana from '@/components/icon/solana';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,6 +18,7 @@ import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 import { DateTimePicker24hForm } from './pick-date-time';
 import { Textarea } from '@/components/ui/textarea';
 import { authClient } from '@/lib/auth-client';
+import { DatePicker } from './pick-date';
 interface Location {
 	name: string;
 	address: string;
@@ -76,7 +78,7 @@ export default function ToFrom() {
 	const [activeInput, setActiveInput] = useState<'pickup' | 'dropoff' | null>(
 		null
 	);
-	const [seats, setSeats] = useState(1)
+	const [seats, setSeats] = useState(1);
 
 	const forwardGeocoding = async (
 		searchQuery: string,
@@ -168,33 +170,33 @@ export default function ToFrom() {
 		}
 	};
 
-	const onCreateRide = async () => {
-		try {
-			const response = await axios.post('/create-ride', {
-				rideMarkerOrigin: pickupQuery,
-				rideMarkerDestination: dropoffQuery,
-				departureTime: ,
-				availableSeats,
-				pricePerSeat: 10,
-				driverId: session?.user.id,
-			});
+	// const onCreateRide = async () => {
+	// 	try {
+	// 		const response = await axios.post('/create-ride', {
+	// 			rideMarkerOrigin: pickupQuery,
+	// 			rideMarkerDestination: dropoffQuery,
+	// 			departureTime: ,
+	// 			availableSeats,
+	// 			pricePerSeat: 10,
+	// 			driverId: session?.user.id,
+	// 		});
 
-			if (response.status == 201) {
-				toast({
-					title: 'Ride Created Successfully',
-					description: 'Your ride has been added to the platform.',
-					variant: 'default',
-				});
-			}
-		} catch (error) {
-			toast({
-				title: 'Ride Creation Failed',
-				description:
-					'There was an error creating your ride. Please try again.',
-				variant: 'destructive',
-			});
-		}
-	};
+	// 		if (response.status == 201) {
+	// 			toast({
+	// 				title: 'Ride Created Successfully',
+	// 				description: 'Your ride has been added to the platform.',
+	// 				variant: 'default',
+	// 			});
+	// 		}
+	// 	} catch (error) {
+	// 		toast({
+	// 			title: 'Ride Creation Failed',
+	// 			description:
+	// 				'There was an error creating your ride. Please try again.',
+	// 			variant: 'destructive',
+	// 		});
+	// 	}
+	// };
 	return (
 		<div className="max-w-xl mx-auto p-6 space-y-8 overflow-y-scroll">
 			<div className="text-4xl font-bold tracking-tight">
@@ -315,7 +317,8 @@ export default function ToFrom() {
 							<SelectItem value="tomorrow">Tomorrow</SelectItem>
 						</SelectContent>
 					</Select> */}
-					<DateTimePicker24hForm />
+					{/* <DateTimePicker24hForm /> */}
+					<DatePicker />
 
 					<Select defaultValue="1">
 						<SelectTrigger className="h-14 border">
@@ -330,8 +333,8 @@ export default function ToFrom() {
 					</Select>
 
 					<Input
-						placeholder="Petrol Cost - 103.99"
-						className="h-14 pl-12 pr-12 flex justify-center items-center w-full"
+						placeholder="Mileage in km/L"
+						className="h-14 pl-12 pr-12"
 					/>
 
 					<Input
@@ -344,17 +347,21 @@ export default function ToFrom() {
 						placeholder="Initial Deposit"
 						className="h-14 pl-12 pr-12"
 					/>
-					<Select defaultValue="SOL">
+					{/* <Select defaultValue="SOL">
 						<SelectTrigger className="h-14 border">
-							{/* <UserRound className="w-5 h-5 mr-2" /> */}
+							
 							<IndianRupee className="w-5 h-5 mr-2" />
+							
 							<SelectValue placeholder="Security Deposit" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="SOL">SOL</SelectItem>
-							{/* <SelectItem value="USDC">USDC</SelectItem> */}
 						</SelectContent>
-					</Select>
+					</Select> */}
+					<Input
+						placeholder="Petrol Cost - 103.99"
+						className="h-14 pl-12 pr-12 flex justify-center items-center w-full"
+					/>
 				</div>
 
 				<Textarea placeholder="Write details related to the ride." />

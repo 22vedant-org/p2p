@@ -12,34 +12,132 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { useDateTimeStore } from '@/hooks/store/useDateTime';
 
 export function DatePicker({ className }: { className?: string }) {
-	const [date, setDate] = React.useState<Date>();
+	// const [date, setDate] = React.useState<Date>();
+	const { date, setDate } = useDateTimeStore();
+	const handleDateSelect = (selectedDate: Date | undefined) => {
+		if (selectedDate) {
+			// Keep time values if date already exists
+			if (date) {
+				selectedDate.setHours(date.getHours(), date.getMinutes());
+			}
+			setDate(selectedDate);
+		} else {
+			setDate(undefined);
+		}
+	};
+
+	const handleTimeChange = (type: 'hour' | 'minute', value: string) => {
+		const newDate = date ? new Date(date) : new Date();
+
+		if (type === 'hour') {
+			newDate.setHours(parseInt(value, 10));
+		} else if (type === 'minute') {
+			newDate.setMinutes(parseInt(value, 10));
+		}
+
+		setDate(newDate);
+	};
 
 	return (
-		<div className={`${className}`}>
+		<div className={className}>
 			<Popover>
 				<PopoverTrigger asChild>
 					<Button
 						variant={'outline'}
 						className={cn(
-							'w-full justify-start text-left font-normal',
-							!date && 'text-muted-foreground h-14 '
+							'w-full px-12 text-left font-normal h-14',
+							!date && 'text-muted-foreground'
 						)}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
-						{date ? format(date, 'PPP') : <span>Pick a date</span>}
+						{date ? (
+							format(date, 'MM/dd/yyyy HH:mm')
+						) : (
+							<span>MM/DD/YYYY HH:mm</span>
+						)}
+						<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="w-auto justify-start text-left font-normal text-muted-foreground">
-					<Calendar
-						mode="single"
-						selected={date}
-						onSelect={setDate}
-						initialFocus
-					/>
+				<PopoverContent className="w-auto p-0">
+					<div className="sm:flex">
+						<Calendar
+							mode="single"
+							selected={date}
+							onSelect={handleDateSelect}
+							initialFocus
+						/>
+						<div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
+							<ScrollArea className="w-64 sm:w-auto">
+								<div className="flex sm:flex-col p-2">
+									{Array.from({ length: 24 }, (_, i) => i)
+										.reverse()
+										.map((hour) => (
+											<Button
+												key={hour}
+												size="icon"
+												variant={
+													date &&
+													date.getHours() === hour
+														? 'default'
+														: 'ghost'
+												}
+												className="sm:w-full shrink-0 aspect-square"
+												onClick={() =>
+													handleTimeChange(
+														'hour',
+														hour.toString()
+													)
+												}
+											>
+												{hour}
+											</Button>
+										))}
+								</div>
+								<ScrollBar
+									orientation="horizontal"
+									className="sm:hidden"
+								/>
+							</ScrollArea>
+							<ScrollArea className="w-64 sm:w-auto">
+								<div className="flex sm:flex-col p-2">
+									{Array.from(
+										{ length: 12 },
+										(_, i) => i * 5
+									).map((minute) => (
+										<Button
+											key={minute}
+											size="icon"
+											variant={
+												date &&
+												date.getMinutes() === minute
+													? 'default'
+													: 'ghost'
+											}
+											className="sm:w-full shrink-0 aspect-square"
+											onClick={() =>
+												handleTimeChange(
+													'minute',
+													minute.toString()
+												)
+											}
+										>
+											{minute.toString().padStart(2, '0')}
+										</Button>
+									))}
+								</div>
+								<ScrollBar
+									orientation="horizontal"
+									className="sm:hidden"
+								/>
+							</ScrollArea>
+						</div>
+					</div>
 				</PopoverContent>
 			</Popover>
+			{/* <div>Credits: time.rdsx.dev</div> */}
 		</div>
 	);
 }
