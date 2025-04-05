@@ -36,9 +36,9 @@ export default async function Home() {
 	// 		confirmPassword: '',
 	// 	},
 	// });
-	function onSubmit(values: z.infer<typeof signUpSchema>) {
-		console.log(values);
-	}
+	// function onSubmit(values: z.infer<typeof signUpSchema>) {
+	// 	console.log(values);
+	// }
 	return (
 		<main className="flex items-center justify-center grow p-8">
 			<div className="flex flex-col items-center gap-4">
@@ -46,6 +46,9 @@ export default async function Home() {
 				<p>You are logged in as: {session?.user?.email}</p>
 				<p>You are logged in as: {session?.user?.name}</p>
 				<p>You&apos;re session id is: {session?.user.id}</p>
+				<p>You&apos;re session id is: {session?.user.image}</p>
+				<p>You&apos;re session id is: {session?.user.phoneNumber}</p>
+				<p>You&apos;re session id is: {session?.user.role}</p>
 			</div>
 		</main>
 		// <div className="grow flex items-center justify-center p-4">

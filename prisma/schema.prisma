@@ -175,7 +175,7 @@ model Bugs {
   Area  BugEnum
   Title String
   Description String
-
+  @@map("bugs")
 }
 enum BugEnum {
   Map

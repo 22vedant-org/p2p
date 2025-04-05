@@ -42,14 +42,14 @@ interface GeocodeResult {
 	}[];
 }
 
-interface RideBody {
-	rideMarkerOrigin: string;
-	rideMarkerDestination: string;
-	departureTime: Date;
-	availableSeats: number;
-	pricePerSeat: number;
-	driverId: string;
-}
+// interface RideBody {
+// 	rideMarkerOrigin: string;
+// 	rideMarkerDestination: string;
+// 	departureTime: Date;
+// 	availableSeats: number;
+// 	pricePerSeat: number;
+// 	driverId: string;
+// }
 export default function ToFrom() {
 	const { toast } = useToast();
 	const { data } = authClient.useSession();
@@ -76,6 +76,7 @@ export default function ToFrom() {
 	const [activeInput, setActiveInput] = useState<'pickup' | 'dropoff' | null>(
 		null
 	);
+	const [seats, setSeats] = useState(1)
 
 	const forwardGeocoding = async (
 		searchQuery: string,
@@ -170,11 +171,11 @@ export default function ToFrom() {
 	const onCreateRide = async () => {
 		try {
 			const response = await axios.post('/create-ride', {
-				rideMarkerOrigin,
-				rideMarkerDestination,
-				departureTime,
+				rideMarkerOrigin: pickupQuery,
+				rideMarkerDestination: dropoffQuery,
+				departureTime: ,
 				availableSeats,
-				pricePerSeat: ,
+				pricePerSeat: 10,
 				driverId: session?.user.id,
 			});
 
@@ -361,10 +362,11 @@ export default function ToFrom() {
 
 			<Button
 				className="w-full h-14 text-lg font-semibold rounded-lg"
-				onClick={onCreateRide}
+				// onClick={onCreateRide}
 			>
 				Create Ride
 			</Button>
+			{/* <p>{pickupQuery}</p> */}
 		</div>
 	);
 }
