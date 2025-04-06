@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DEMO_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -23,7 +23,8 @@ model User {
   role            String        @default("rider")
   // emailVerifiedAt DateTime?
   companyName     String?
-  banned          Boolean       @default(false)
+  banned          Boolean?       @default(false)
+  bio             String?
   // banExpiration   Int?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
