@@ -12,12 +12,12 @@ import {
 	PhantomWalletAdapter,
 	SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 type AppWalletProviderProps = {
 	children: React.ReactNode;
 };
 
-require('@solana/wallet-adapter-react-ui/styles.css');
 const AppWalletProvider = ({ children }: AppWalletProviderProps) => {
 	const network = WalletAdapterNetwork.Devnet;
 	const endpoint = useMemo(() => clusterApiUrl(network), [network]);

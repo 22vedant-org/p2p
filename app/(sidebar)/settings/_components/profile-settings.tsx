@@ -18,8 +18,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera } from 'lucide-react';
+import { Camera, Send, Upload } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import axios from 'axios';
 
 const profileFormSchema = z.object({
 	name: z.string().min(2, {
@@ -43,6 +44,10 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function ProfileSettings() {
 	const [isLoading, setIsLoading] = useState(false);
+	const [file, setFile] = useState<File>();
+	const [url, setUrl] = useState('');
+	const [uploading, setUploading] = useState(false);
+
 	const { data } = authClient.useSession();
 	const session = data;
 	const defaultValues: Partial<ProfileFormValues> = {
@@ -61,6 +66,7 @@ export default function ProfileSettings() {
 		setIsLoading(true);
 
 		// Simulate API call
+
 		setTimeout(() => {
 			setIsLoading(false);
 			toast({
@@ -70,6 +76,37 @@ export default function ProfileSettings() {
 			});
 		}, 1000);
 	}
+
+	const onFormData = async (data: ProfileFormValues) => {};
+
+	const uploadFile = async () => {
+		try {
+			if (!file) {
+				alert('No file selected');
+				return;
+			}
+
+			setUploading(true);
+			const data = new FormData();
+			data.set('file', file);
+			const uploadRequest = await fetch('/api/files', {
+				method: 'POST',
+				body: data,
+			});
+			const ipfsUrl = await uploadRequest.json();
+			setUrl(ipfsUrl);
+
+			setUploading(false);
+		} catch (e) {
+			console.log(e);
+			setUploading(false);
+			alert('Trouble uploading file');
+		}
+	};
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setFile(e.target?.files?.[0]);
+	};
 
 	return (
 		<div className="space-y-6">
@@ -83,25 +120,36 @@ export default function ProfileSettings() {
 
 			<div className="flex items-center gap-6">
 				<Avatar className="h-24 w-24">
-					<AvatarImage
-						src="/placeholder.svg?height=96&width=96"
-						alt="Profile"
+					<AvatarImage src={session?.user.image!} alt="Profile" />
+					<input
+						type="file"
+						className="absolute inset-0 opacity-0 cursor-pointer"
+						accept="image/*"
+						onChange={handleChange}
 					/>
 					<AvatarFallback>{session?.user.name[0]}</AvatarFallback>
 				</Avatar>
 				<div>
-					<Button variant="outline" size="sm" className="relative">
+					{/* <Button variant="outline" size="sm" className="relative">
+						Change Avatar
+						</Button> */}
+					<div className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs relative">
 						<Camera className="mr-2 h-4 w-4" />
 						Change Avatar
-						<input
-							type="file"
-							className="absolute inset-0 opacity-0 cursor-pointer"
-							accept="image/*"
-						/>
-					</Button>
+					</div>
 					<p className="mt-2 text-xs text-muted-foreground">
-						JPG, PNG or GIF. 1MB max.
+						JPG or PNG. 10MB max.
 					</p>
+					<Button
+						variant="outline"
+						size="sm"
+						className="relative mt-2"
+						onClick={uploadFile}
+					>
+						{/* <Send className="mr-2 h-4 w-4" /> */}
+						<Upload className="mr-2 h-4 w-4" />
+						Submit
+					</Button>
 				</div>
 			</div>
 
