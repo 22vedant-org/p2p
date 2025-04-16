@@ -161,7 +161,7 @@ export default function ToAndFrom() {
 						<div className="relative">
 							<Input
 								placeholder="Pickup location"
-								className="pl-12 pr-12 h-14 bg-gray-100 border-0 text-black"
+								className="pl-12 pr-12 h-14 border"
 								value={pickupQuery}
 								onChange={(e) => {
 									setPickupQuery(e.target.value);
@@ -211,7 +211,7 @@ export default function ToAndFrom() {
 
 						<Input
 							placeholder="Dropoff location"
-							className="pl-12 pr-4 h-14 bg-gray-100 border-0 text-black"
+							className="pl-12 pr-4 h-14 border"
 							value={dropoffQuery}
 							onChange={(e) => {
 								setDropoffQuery(e.target.value);

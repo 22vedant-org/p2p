@@ -27,14 +27,36 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const { area, title, description } = body || {};
+		const { name, email, phoneNumber, bio } = body || {};
 
 		// ✅ Validate required fields
-		if (!area || !title || !description) {
+		if (!name || !email || !phoneNumber || !bio) {
 			return NextResponse.json(
 				{ error: 'All fields are required' },
 				{ status: 400 }
 			);
 		}
-	} catch (error) {}
+
+		const updateProfile = await prisma.user.update({
+			where: {
+				email: session?.user.email,
+			},
+			data: {
+				name,
+				email,
+				phoneNumber,
+				bio,
+			},
+		});
+
+		return NextResponse.json(
+			{
+				message: 'Profile updated successfully',
+				updateProfile,
+			},
+			{ status: 204 }
+		);
+	} catch (error) {
+		console.log(error);
+	}
 }

@@ -24,6 +24,7 @@ import {
 	CigaretteIcon as Smoking,
 	Star,
 	Users,
+	ShieldUser,
 } from 'lucide-react';
 
 export default function RidePreferences() {
@@ -39,6 +40,7 @@ export default function RidePreferences() {
 		saveFrequentRoutes: true,
 		autoMatchRides: true,
 		carbonOffsetting: true,
+		womenOnly: false,
 	});
 
 	function onSubmit() {
@@ -290,6 +292,25 @@ export default function RidePreferences() {
 						checked={preferences.carbonOffsetting}
 						onCheckedChange={(value) =>
 							updatePreference('carbonOffsetting', value)
+						}
+					/>
+				</div>
+				<div className="flex items-center justify-between">
+					<div className="space-y-0.5">
+						<div className="flex items-center">
+							{/* <Car className="mr-2 h-4 w-4" /> */}
+							<ShieldUser className="mr-2 h-4 w-4" />
+							<span>Women Only Ride Option</span>
+						</div>
+						<p className="text-sm text-muted-foreground">
+							Choose a female-driven cab for a comfortable, safe,
+							and supportive travel experience.
+						</p>
+					</div>
+					<Switch
+						checked={preferences.womenOnly}
+						onCheckedChange={(value) =>
+							updatePreference('womenOnly', value)
 						}
 					/>
 				</div>
