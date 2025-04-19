@@ -104,6 +104,7 @@ model Ride {
   departureTime   String
   availableSeats  Int
   pricePerSeat    Float
+  rideBio         String?
   status          RideStatus    @default(PENDING)
   smartContractAddress  String? 
   createdAt       DateTime      @default(now())
@@ -157,7 +158,11 @@ model Transaction {
 model Review {
   id          String    @id @default(cuid())
   rating      Int
-  comment     String
+  title       String
+  content     String
+  likes       Int
+  // comments    Comments[]
+  blockAddress String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 

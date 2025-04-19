@@ -1,24 +1,48 @@
 ## Getting Started
 
-First, start a postgres instance in Docker or grab a free PostgreSQL database instance from [Aiven](https://aiven.io/postgresql) or [Neon](https://neon.tech/)
+### Database Setup
 
-Then, run the development server:
+First, set up a PostgreSQL database using one of these options:
+
+-   Start a PostgreSQL instance in Docker:
+    ```bash
+    docker run --name postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
+    ```
+-   Or grab a free PostgreSQL database instance from [Aiven](https://aiven.io/postgresql) or [Neon](https://neon.tech/)
+
+### Environment Configuration
+
+Copy the example environment file and configure your environment variables:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Edit the `.env` file and add the required variables, especially your database connection string.
+
+### Database Migration
+
+Run the Prisma migration to set up your database schema:
+
+```bash
+yarn prisma migrate dev
+```
+
+### Starting the Development Server
+
+Run the development server:
+
+```bash
+yarn dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+
+## Testing
 
 For testing purposes, you can use the following credentials:
 
 ```bash
-email: zydova2236@dropjar.com
-password: password
+Email: zydova2236@dropjar.com
+Password: password
 ```

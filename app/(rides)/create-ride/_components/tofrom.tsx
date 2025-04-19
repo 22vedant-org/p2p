@@ -19,6 +19,7 @@ import { DateTimePicker24hForm } from './pick-date-time';
 import { Textarea } from '@/components/ui/textarea';
 import { authClient } from '@/lib/auth-client';
 import { DatePicker } from './pick-date';
+import { usePlaceStore } from '@/hooks/store/usePlace';
 interface Location {
 	name: string;
 	address: string;
@@ -62,6 +63,7 @@ export default function ToFrom() {
 		setMarkerDestination,
 		setMarkerOrigin,
 	} = useMarkerPositionsStore();
+	const { locationAName, locationBName } = usePlaceStore();
 	const [pickupQuery, setPickupQuery] = useState('');
 	const [dropoffQuery, setDropoffQuery] = useState('');
 	const [pickupGeocodeResults, setPickupGeocodeResults] = useState<
@@ -78,7 +80,7 @@ export default function ToFrom() {
 	const [activeInput, setActiveInput] = useState<'pickup' | 'dropoff' | null>(
 		null
 	);
-	const [seats, setSeats] = useState(1);
+	const [seats, setSeats] = useState('1');
 
 	const forwardGeocoding = async (
 		searchQuery: string,
@@ -209,7 +211,7 @@ export default function ToFrom() {
 							<Input
 								placeholder="Pickup location"
 								className="pl-12 pr-12 h-14 border"
-								value={pickupQuery}
+								value={pickupQuery || locationAName}
 								onChange={(e) => {
 									setPickupQuery(e.target.value);
 									setActiveInput('pickup');
@@ -259,7 +261,7 @@ export default function ToFrom() {
 						<Input
 							placeholder="Dropoff location"
 							className="pl-12 pr-4 h-14 border"
-							value={dropoffQuery}
+							value={dropoffQuery || locationBName}
 							onChange={(e) => {
 								setDropoffQuery(e.target.value);
 								setActiveInput('dropoff');
@@ -290,14 +292,6 @@ export default function ToFrom() {
 												<div className="font-medium text-black">
 													{result.formatted_address}
 												</div>
-												<div className="text-sm text-gray-600">
-													{result.address_components
-														.map(
-															(component) =>
-																component.long_name
-														)
-														.join(', ')}
-												</div>
 											</li>
 										)
 									)}
@@ -320,7 +314,11 @@ export default function ToFrom() {
 					{/* <DateTimePicker24hForm /> */}
 					<DatePicker />
 
-					<Select defaultValue="1">
+					<Select
+						defaultValue="1"
+						onValueChange={setSeats}
+						value={seats}
+					>
 						<SelectTrigger className="h-14 border">
 							<UserRound className="w-5 h-5 mr-2" />
 							<SelectValue placeholder="Number of Passengers" />
@@ -329,6 +327,7 @@ export default function ToFrom() {
 							<SelectItem value="1">1</SelectItem>
 							<SelectItem value="2">2</SelectItem>
 							<SelectItem value="3">3</SelectItem>
+							<SelectItem value="4">4</SelectItem>
 						</SelectContent>
 					</Select>
 
@@ -359,7 +358,7 @@ export default function ToFrom() {
 						</SelectContent>
 					</Select> */}
 					<Input
-						placeholder="Petrol Cost - 103.99"
+						placeholder="Petrol Cost"
 						className="h-14 pl-12 pr-12 flex justify-center items-center w-full"
 					/>
 				</div>

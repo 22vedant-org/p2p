@@ -12,7 +12,6 @@ const page = () => {
 				<RideDetails />
 			</div>
 			<div className="px-4">
-				{/* <WalletOverview /> */}
 				<TransactionHistory />
 			</div>
 		</div>

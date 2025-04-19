@@ -53,19 +53,23 @@ export default function ProfileSettings() {
 	const defaultValues: Partial<ProfileFormValues> = {
 		name: session?.user.name,
 		email: session?.user.email,
-		phone: '555-123-4567',
-		bio: 'Regular commuter between downtown and the tech district.',
+		phone: session?.user.phoneNumber || '555-123-4567',
+		bio: '',
 	};
 	const form = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
-		// defaultValues,
+		defaultValues,
 		mode: 'onChange',
 	});
 
-	function onSubmit(data: ProfileFormValues) {
+	const onSubmit = async (data: ProfileFormValues) => {
 		setIsLoading(true);
-
-		// Simulate API call
+		const response = await axios.post('/api/update-user', {
+			name: data.name,
+			email: data.email,
+			phoneNumber: data.phone,
+			bio: data.bio,
+		});
 
 		setTimeout(() => {
 			setIsLoading(false);
@@ -75,9 +79,7 @@ export default function ProfileSettings() {
 					'Your profile information has been updated successfully.',
 			});
 		}, 1000);
-	}
-
-	const onFormData = async (data: ProfileFormValues) => {};
+	};
 
 	const uploadFile = async () => {
 		try {
@@ -95,7 +97,6 @@ export default function ProfileSettings() {
 			});
 			const ipfsUrl = await uploadRequest.json();
 			setUrl(ipfsUrl);
-
 			setUploading(false);
 		} catch (e) {
 			console.log(e);
