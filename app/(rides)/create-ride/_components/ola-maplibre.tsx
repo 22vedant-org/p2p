@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import {
@@ -13,7 +14,7 @@ import polyline from '@mapbox/polyline';
 import { Feature, LineString } from 'geojson';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 import { usePlaceStore } from '@/hooks/store/usePlace';
-
+import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
 const OlaMaplibre = () => {
 	const mapRef = useRef<HTMLDivElement>(null);
 	const mapInstance = useRef<Map | null>(null); // Reference to the map instance
@@ -26,12 +27,13 @@ const OlaMaplibre = () => {
 		setMarkerOrigin,
 	} = useMarkerPositionsStore();
 	const { setLocationA, setLocationB } = usePlaceStore();
+	const { polyCords, setPolyCords } = usePolyLineStore();
 	// const [markerPositions, setMarkerPositions] = useState({
 	// 	markerOrigin: { lng: 73.847466, lat: 18.530823 },
 	// 	markerDestination: { lng: 73.8547, lat: 18.4655 },
 	// });
 
-	const [polyCords, setPolyCords] = useState<[number, number][]>([]);
+	// const [polyCords, setPolyCords] = useState<[number, number][]>([]);
 
 	const sendParamsOla = useCallback(async () => {
 		try {
@@ -109,6 +111,7 @@ const OlaMaplibre = () => {
 
 	useEffect(() => {
 		sendParamsOla();
+		console.log(polyCords);
 	}, [sendParamsOla]);
 
 	// Initialize the map only once
@@ -134,7 +137,7 @@ const OlaMaplibre = () => {
 			},
 		});
 
-		myMap.scrollZoom.disable();
+		// myMap.scrollZoom.disable();
 
 		myMap.addControl(
 			new NavigationControl({

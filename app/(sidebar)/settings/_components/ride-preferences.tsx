@@ -36,7 +36,7 @@ export default function RidePreferences() {
 		allowMusic: true,
 		maxPassengers: 3,
 		paymentMethod: 'crypto',
-		preferredNetwork: 'ethereum',
+		preferredNetwork: 'solana',
 		saveFrequentRoutes: true,
 		autoMatchRides: true,
 		carbonOffsetting: true,
@@ -77,12 +77,12 @@ export default function RidePreferences() {
 				<div className="space-y-2">
 					<div className="flex items-center">
 						<MapPin className="mr-2 h-4 w-4" />
-						<Label>Maximum pickup distance (miles)</Label>
+						<Label>Maximum pickup distance (kms)</Label>
 					</div>
 					<Slider
 						value={[preferences.maxDistance]}
 						min={1}
-						max={10}
+						max={8}
 						step={1}
 						onValueChange={(value) =>
 							updatePreference('maxDistance', value[0])
@@ -90,7 +90,7 @@ export default function RidePreferences() {
 						className="w-full"
 					/>
 					<p className="text-sm text-muted-foreground">
-						Current: {preferences.maxDistance} miles
+						Current: {preferences.maxDistance} kms
 					</p>
 				</div>
 
@@ -190,13 +190,13 @@ export default function RidePreferences() {
 						<div className="flex items-center space-x-2">
 							<RadioGroupItem value="crypto" id="crypto" />
 							<Label htmlFor="crypto">
-								Cryptocurrency (blockchain)
+								Cryptocurrency (Blockchain)
 							</Label>
 						</div>
 						<div className="flex items-center space-x-2">
 							<RadioGroupItem value="fiat" id="fiat" />
 							<Label htmlFor="fiat">
-								Traditional payment (credit card)
+								Traditional payment (UPI)
 							</Label>
 						</div>
 						<div className="flex items-center space-x-2">
@@ -220,15 +220,20 @@ export default function RidePreferences() {
 								<SelectValue placeholder="Select network" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="ethereum">
-									Ethereum
+								<SelectItem value={'solana'}>Solana</SelectItem>
+								<SelectItem
+									value="ethereum"
+									disabled
+									// className="cursor-not-allowed"
+								>
+									Ethereum (Coming Soon...)
 								</SelectItem>
-								<SelectItem value="polygon">Polygon</SelectItem>
-								<SelectItem value="optimism">
-									Optimism
-								</SelectItem>
-								<SelectItem value="arbitrum">
-									Arbitrum
+								<SelectItem
+									value="polygon"
+									disabled
+									// className="cursor-not-allowed"
+								>
+									Polygon (Coming Soon...)
 								</SelectItem>
 							</SelectContent>
 						</Select>
@@ -289,10 +294,12 @@ export default function RidePreferences() {
 						</p>
 					</div>
 					<Switch
-						checked={preferences.carbonOffsetting}
-						onCheckedChange={(value) =>
-							updatePreference('carbonOffsetting', value)
-						}
+						disabled
+						className="cursor-not-allowed"
+						// checked={preferences.carbonOffsetting}
+						// onCheckedChange={(value) =>
+						// 	updatePreference('carbonOffsetting', value)
+						// }
 					/>
 				</div>
 				<div className="flex items-center justify-between">

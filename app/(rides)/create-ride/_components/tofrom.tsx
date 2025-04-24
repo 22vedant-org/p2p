@@ -20,6 +20,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { authClient } from '@/lib/auth-client';
 import { DatePicker } from './pick-date';
 import { usePlaceStore } from '@/hooks/store/usePlace';
+import { useDateTimeStore } from '@/hooks/store/useDateTime';
+import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
+
 interface Location {
 	name: string;
 	address: string;
@@ -45,14 +48,6 @@ interface GeocodeResult {
 	}[];
 }
 
-// interface RideBody {
-// 	rideMarkerOrigin: string;
-// 	rideMarkerDestination: string;
-// 	departureTime: Date;
-// 	availableSeats: number;
-// 	pricePerSeat: number;
-// 	driverId: string;
-// }
 export default function ToFrom() {
 	const { toast } = useToast();
 	const { data } = authClient.useSession();
@@ -63,6 +58,7 @@ export default function ToFrom() {
 		setMarkerDestination,
 		setMarkerOrigin,
 	} = useMarkerPositionsStore();
+	const { polyCords } = usePolyLineStore();
 	const { locationAName, locationBName } = usePlaceStore();
 	const [pickupQuery, setPickupQuery] = useState('');
 	const [dropoffQuery, setDropoffQuery] = useState('');
@@ -81,7 +77,9 @@ export default function ToFrom() {
 		null
 	);
 	const [seats, setSeats] = useState('1');
-
+	const [rideDetails, setRideDetails] = useState('');
+	const [initialDeposit, setInitialDeposit] = useState(0.0);
+	const { date } = useDateTimeStore();
 	const forwardGeocoding = async (
 		searchQuery: string,
 		inputType: 'pickup' | 'dropoff'
@@ -172,33 +170,37 @@ export default function ToFrom() {
 		}
 	};
 
-	// const onCreateRide = async () => {
-	// 	try {
-	// 		const response = await axios.post('/create-ride', {
-	// 			rideMarkerOrigin: pickupQuery,
-	// 			rideMarkerDestination: dropoffQuery,
-	// 			departureTime: ,
-	// 			availableSeats,
-	// 			pricePerSeat: 10,
-	// 			driverId: session?.user.id,
-	// 		});
+	const onCreateRide = async () => {
+		try {
+			const response = await axios.post('/api/create-ride', {
+				rideMarkerOrigin: pickupQuery || locationAName,
+				rideMarkerDestination: dropoffQuery || locationBName,
+				departureTime: date,
+				availableSeats: seats,
+				// pricePerSeat: 10,
+				initialDeposit: initialDeposit,
+				driverId: session?.user.id,
+				rideBio: rideDetails,
+				polyLineCoords: polyCords,
+			});
 
-	// 		if (response.status == 201) {
-	// 			toast({
-	// 				title: 'Ride Created Successfully',
-	// 				description: 'Your ride has been added to the platform.',
-	// 				variant: 'default',
-	// 			});
-	// 		}
-	// 	} catch (error) {
-	// 		toast({
-	// 			title: 'Ride Creation Failed',
-	// 			description:
-	// 				'There was an error creating your ride. Please try again.',
-	// 			variant: 'destructive',
-	// 		});
-	// 	}
-	// };
+			if (response.status == 201) {
+				toast({
+					title: 'Ride Created Successfully',
+					description: 'Your ride has been added to the platform.',
+					variant: 'default',
+				});
+			}
+		} catch (error) {
+			toast({
+				title: 'Ride Creation Failed',
+				description:
+					'There was an error creating your ride. Please try again.',
+				variant: 'destructive',
+			});
+		}
+	};
+
 	return (
 		<div className="max-w-xl mx-auto p-6 space-y-8 overflow-y-scroll">
 			<div className="text-4xl font-bold tracking-tight">
@@ -330,45 +332,39 @@ export default function ToFrom() {
 							<SelectItem value="4">4</SelectItem>
 						</SelectContent>
 					</Select>
-
-					<Input
-						placeholder="Mileage in km/L"
-						className="h-14 pl-12 pr-12"
-					/>
-
-					<Input
-						placeholder="Mileage in km/L"
-						className="h-14 pl-12 pr-12"
-					/>
 				</div>
 				<div className="grid grid-cols-2 gap-4">
 					<Input
 						placeholder="Initial Deposit"
 						className="h-14 pl-12 pr-12"
+						onChange={(e) =>
+							setInitialDeposit(parseFloat(e.target.value))
+						}
 					/>
-					{/* <Select defaultValue="SOL">
+					<Select defaultValue="SOL">
 						<SelectTrigger className="h-14 border">
-							
 							<IndianRupee className="w-5 h-5 mr-2" />
-							
+
 							<SelectValue placeholder="Security Deposit" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="SOL">SOL</SelectItem>
 						</SelectContent>
-					</Select> */}
-					<Input
-						placeholder="Petrol Cost"
-						className="h-14 pl-12 pr-12 flex justify-center items-center w-full"
-					/>
+					</Select>
 				</div>
 
-				<Textarea placeholder="Write details related to the ride." />
+				<Textarea
+					placeholder="Write details related to the ride."
+					onChange={(e) => {
+						setRideDetails(e.target.value);
+					}}
+					value={rideDetails}
+				/>
 			</div>
 
 			<Button
 				className="w-full h-14 text-lg font-semibold rounded-lg"
-				// onClick={onCreateRide}
+				onClick={onCreateRide}
 			>
 				Create Ride
 			</Button>

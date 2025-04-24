@@ -7,7 +7,8 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"db:st": "prisma studio"
+		"db:st": "prisma studio",
+		"db:gen": "prisma generate"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.10.0",

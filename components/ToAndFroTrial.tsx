@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, Navigation } from 'lucide-react';
+import { Calendar, Clock, Navigation, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -59,6 +60,11 @@ export default function ToAndFrom() {
 	const [activeInput, setActiveInput] = useState<'pickup' | 'dropoff' | null>(
 		null
 	);
+	const [seats, setSeats] = useState('1');
+
+	const handleRideSearch = async () => {
+		console.log('Hello');
+	};
 
 	const forwardGeocoding = async (
 		searchQuery: string,
@@ -261,7 +267,7 @@ export default function ToAndFrom() {
 
 				<div className="grid grid-cols-2 gap-4">
 					<Select defaultValue="today">
-						<SelectTrigger className="h-14 bg-gray-100 border-0 text-black">
+						<SelectTrigger className="h-14 border">
 							<Calendar className="w-5 h-5 mr-2" />
 							<SelectValue placeholder="Select date" />
 						</SelectTrigger>
@@ -271,22 +277,29 @@ export default function ToAndFrom() {
 						</SelectContent>
 					</Select>
 
-					<Select defaultValue="now">
-						<SelectTrigger className="h-14 bg-gray-100 border-0 text-black">
-							<Clock className="w-5 h-5 mr-2" />
-							<SelectValue placeholder="Select time" />
+					<Select
+						defaultValue="1"
+						onValueChange={setSeats}
+						value={seats}
+					>
+						<SelectTrigger className="h-14 border">
+							<UserRound className="w-5 h-5 mr-2" />
+							<SelectValue placeholder="Number of Passengers" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="now">Now</SelectItem>
-							<SelectItem value="later">
-								Schedule for later
-							</SelectItem>
+							<SelectItem value="1">1</SelectItem>
+							<SelectItem value="2">2</SelectItem>
+							<SelectItem value="3">3</SelectItem>
+							<SelectItem value="4">4</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
 			</div>
 
-			<Button className="w-full h-14 text-lg font-semibold rounded-lg">
+			<Button
+				className="w-full h-14 text-lg font-semibold rounded-lg"
+				onClick={handleRideSearch}
+			>
 				See prices
 			</Button>
 		</div>

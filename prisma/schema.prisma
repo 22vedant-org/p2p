@@ -21,7 +21,7 @@ model User {
   emailVerified   Boolean       @default(false)
   phoneNumber     String?
   role            String        @default("rider")
-  // emailVerifiedAt DateTime?
+  gender          Gender?
   companyName     String?
   banned          Boolean?       @default(false)
   bio             String?
@@ -103,8 +103,10 @@ model Ride {
   endLocation     String
   departureTime   String
   availableSeats  Int
-  pricePerSeat    Float
+  // pricePerSeat    Float
+  initialDeposit   Float
   rideBio         String?
+  polyLineCoords  Json
   status          RideStatus    @default(PENDING)
   smartContractAddress  String? 
   createdAt       DateTime      @default(now())
@@ -211,4 +213,10 @@ enum TransactionStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  OTHER
 }

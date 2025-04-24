@@ -35,8 +35,10 @@ export async function POST(req: NextRequest) {
 			rideMarkerDestination,
 			departureTime,
 			availableSeats,
-			pricePerSeat,
-			driverId, // Expecting driverId from request
+			initialDeposit,
+			driverId,
+			rideBio,
+			polyLineCoords,
 		} = body || {};
 
 		// ✅ Validate required fields
@@ -44,7 +46,11 @@ export async function POST(req: NextRequest) {
 			!rideMarkerOrigin ||
 			!rideMarkerDestination ||
 			!departureTime ||
-			!driverId
+			!driverId ||
+			!polyLineCoords ||
+			!initialDeposit ||
+			!availableSeats ||
+			!rideBio
 		) {
 			return NextResponse.json(
 				{ error: 'Missing required fields' },
@@ -67,9 +73,11 @@ export async function POST(req: NextRequest) {
 				startLocation: rideMarkerOrigin,
 				endLocation: rideMarkerDestination,
 				departureTime: parsedDepartureTime.toString(),
-				availableSeats: Number(availableSeats) || 1, // Default to 1 seat if invalid
-				pricePerSeat: Number(pricePerSeat) || 0, // Default to 0 price if invalid
+				availableSeats: Number(availableSeats) || 1,
+				initialDeposit: initialDeposit || 0,
+				polyLineCoords: polyLineCoords || [],
 				driverId, // Using passed driverId
+				rideBio,
 			},
 		});
 
