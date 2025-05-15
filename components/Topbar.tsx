@@ -19,13 +19,7 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useRouter } from 'next/navigation';
 import { Session } from '@/lib/auth';
 
-// import type { Data } from '@/lib/auth-client';
 import ConnectWalletButton from './ConnectionWalletButton';
-// const godber = localFont({
-// 	src: './fonts/godber-3lxoz.ttf',
-// 	variable: '--font-godber',
-// 	// weight: ['400'],
-// });
 const anton = Anton({
 	subsets: ['latin'],
 	weight: ['400'],

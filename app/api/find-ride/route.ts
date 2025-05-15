@@ -28,6 +28,39 @@ export async function POST(req: NextRequest) {
 		}
 
 		// ✅ Destructure body with default values
-		const {} = body || {};
+		const { pickupQuery, dropoffQuery, departureTime } = body || {};
+
+		const response = await prisma.ride.findFirst({
+			where: {
+				OR: [
+					{
+						AND: [
+							{
+								startLocation: pickupQuery,
+							},
+							{
+								endLocation: dropoffQuery,
+							},
+							{
+								departureTime,
+							},
+						],
+					},
+					{
+						AND: [
+							{
+								endLocation: dropoffQuery,
+							},
+							{
+								polyLineCoords: {
+									array_contains: [],
+								},
+							},
+						],
+					},
+					{},
+				],
+			},
+		});
 	} catch (error) {}
 }

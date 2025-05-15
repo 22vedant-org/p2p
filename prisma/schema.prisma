@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DEV_DATABASE_URL")
 }
 
 model User {
@@ -21,7 +21,7 @@ model User {
   emailVerified   Boolean       @default(false)
   phoneNumber     String?
   role            String        @default("rider")
-  // emailVerifiedAt DateTime?
+  gender          Gender?
   companyName     String?
   banned          Boolean?       @default(false)
   bio             String?
@@ -103,9 +103,11 @@ model Ride {
   endLocation     String
   departureTime   String
   availableSeats  Int
-  pricePerSeat    Float
+  // pricePerSeat    Float
+  initialDeposit   Float
   rideBio         String?
-  status          RideStatus    @default(PENDING)
+  polyLineCoords  Json
+  status          RideStatus    @default(AVAILABLE)
   smartContractAddress  String? 
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -193,6 +195,7 @@ enum BugEnum {
 }
 enum RideStatus {
   PENDING
+  AVAILABLE
   CONFIRMED
   IN_PROGRESS
   COMPLETED
@@ -211,4 +214,10 @@ enum TransactionStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  OTHER
 }

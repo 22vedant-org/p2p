@@ -25,8 +25,6 @@ export function DatePicker({ className }: { className?: string }) {
 				selectedDate.setHours(date.getHours(), date.getMinutes());
 			}
 			setDate(selectedDate);
-		} else {
-			setDate(undefined);
 		}
 	};
 

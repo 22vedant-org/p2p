@@ -138,21 +138,25 @@ export function NavUser({
 								<CreditCard />
 								Payments
 							</DropdownMenuItem>
-							<DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => {
+									router.push('/messages');
+								}}
+							>
 								<Bell />
 								Notifications
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem
-							onClick={() => async () => {
+							onClick={async () => {
 								try {
 									await authClient.signOut({
 										fetchOptions: {
 											onSuccess: () => {
-												router.push('/sign-in');
+												router.push('/landing');
 												router.refresh();
-												// authClient.revokeSessions();
+												authClient.revokeSessions();
 											},
 										},
 									});
