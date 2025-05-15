@@ -1,12 +1,6 @@
 'use client';
 
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
 	Form,
 	FormControl,
@@ -14,19 +8,47 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
+	FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import LoadingButton from '@/components/loading-button';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 
 import Link from 'next/link';
 
-import { signUpSchema } from '@/lib/zod';
+import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { authClient } from '@/lib/auth-client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+
+// Updated schema based on User model
+const signUpSchema = z
+	.object({
+		name: z.string().min(2, 'Name must be at least 2 characters'),
+		email: z.string().email('Please enter a valid email'),
+		password: z.string().min(8, 'Password must be at least 8 characters'),
+		confirmPassword: z.string(),
+		phoneNumber: z
+			.string()
+			.min(10, 'Please enter a valid phone number')
+			.optional()
+			.nullable(),
+		role: z.enum(['rider', 'driver']),
+		gender: z.enum(['MALE', 'FEMALE', 'OTHER']).optional().nullable(),
+		companyName: z.string().optional().nullable(),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords don't match",
+		path: ['confirmPassword'],
+	});
 
 export default function SignUp() {
 	const [pending, setPending] = useState(false);
@@ -39,15 +61,23 @@ export default function SignUp() {
 			email: '',
 			password: '',
 			confirmPassword: '',
+			phoneNumber: '',
+			role: 'rider',
+			gender: null,
+			companyName: '',
 		},
 	});
 
 	const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
 		await authClient.signUp.email(
 			{
-				email: values.email!,
-				password: values.password!,
-				name: values.name!,
+				email: values.email,
+				password: values.password,
+				name: values.name,
+				phoneNumber: values.phoneNumber || null,
+				role: values.role,
+				gender: values.gender || null,
+				companyName: values.companyName || null,
 			},
 			{
 				onRequest: () => {
@@ -73,9 +103,13 @@ export default function SignUp() {
 		setPending(false);
 	};
 
+	// Show company name field only when role is driver
+	const watchRole = form.watch('role');
+	const showCompanyField = watchRole === 'driver';
+
 	return (
 		<div className="grow flex items-center justify-center p-4">
-			<Card className="w-[50%] max-w-md">
+			<Card className="w-full max-w-md">
 				<CardHeader>
 					<h2 className="text-2xl font-bold text-center">
 						Create Account
@@ -85,7 +119,7 @@ export default function SignUp() {
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
-							className="space-y-8"
+							className="space-y-4"
 						>
 							<FormField
 								control={form.control}
@@ -99,13 +133,11 @@ export default function SignUp() {
 												{...field}
 											/>
 										</FormControl>
-										{/* <FormDescription>
-											This is your public display name.
-										</FormDescription> */}
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
+
 							<FormField
 								control={form.control}
 								name="email"
@@ -119,14 +151,122 @@ export default function SignUp() {
 												{...field}
 											/>
 										</FormControl>
-										{/* <FormDescription>
-											We'll never share your email with
-											anyone else.
-										</FormDescription> */}
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
+
+							<FormField
+								control={form.control}
+								name="phoneNumber"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Phone Number</FormLabel>
+										<FormControl>
+											<Input
+												type="tel"
+												placeholder="+1234567890"
+												{...field}
+												value={field.value || ''}
+											/>
+										</FormControl>
+										<FormDescription>
+											Your phone number for contact
+											purposes
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<div className="grid grid-cols-2 gap-4">
+								<FormField
+									control={form.control}
+									name="role"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Account Type</FormLabel>
+											<Select
+												onValueChange={field.onChange}
+												defaultValue={field.value}
+											>
+												<FormControl>
+													<SelectTrigger>
+														<SelectValue placeholder="Select role" />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													<SelectItem value="rider">
+														Rider
+													</SelectItem>
+													<SelectItem value="driver">
+														Driver
+													</SelectItem>
+												</SelectContent>
+											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name="gender"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Gender</FormLabel>
+											<Select
+												onValueChange={field.onChange}
+												defaultValue={
+													field.value || undefined
+												}
+											>
+												<FormControl>
+													<SelectTrigger>
+														<SelectValue placeholder="Select gender" />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													<SelectItem value="MALE">
+														Male
+													</SelectItem>
+													<SelectItem value="FEMALE">
+														Female
+													</SelectItem>
+													<SelectItem value="OTHER">
+														Other
+													</SelectItem>
+												</SelectContent>
+											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+
+							{showCompanyField && (
+								<FormField
+									control={form.control}
+									name="companyName"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Company Name</FormLabel>
+											<FormControl>
+												<Input
+													placeholder="Your Company"
+													{...field}
+													value={field.value || ''}
+												/>
+											</FormControl>
+											<FormDescription>
+												Required for driver accounts
+											</FormDescription>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							)}
+
 							<FormField
 								control={form.control}
 								name="password"
@@ -140,14 +280,14 @@ export default function SignUp() {
 												{...field}
 											/>
 										</FormControl>
-										{/* <FormDescription>
-											Your password must be at least 8
-											characters long.
-										</FormDescription> */}
+										<FormDescription>
+											Must be at least 8 characters
+										</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
+
 							<FormField
 								control={form.control}
 								name="confirmPassword"
@@ -161,13 +301,11 @@ export default function SignUp() {
 												{...field}
 											/>
 										</FormControl>
-										{/* <FormDescription>
-											Please confirm your password.
-										</FormDescription> */}
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
+
 							<LoadingButton pending={pending}>
 								Sign Up
 							</LoadingButton>
@@ -182,9 +320,6 @@ export default function SignUp() {
 						</Link>
 					</div>
 				</CardContent>
-				{/* <CardFooter className="text-center">
-					<Link href={'/sign-in'}>Already have an account? </Link>
-				</CardFooter> */}
 			</Card>
 		</div>
 	);

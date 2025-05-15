@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import axios from 'axios';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
+import prisma from '@/lib/prisma';
 interface Location {
 	name: string;
 	address: string;
@@ -62,9 +63,7 @@ export default function ToAndFrom() {
 	);
 	const [seats, setSeats] = useState('1');
 
-	const handleRideSearch = async () => {
-		console.log('Hello');
-	};
+	const handleRideSearch = async () => {};
 
 	const forwardGeocoding = async (
 		searchQuery: string,
@@ -103,7 +102,6 @@ export default function ToAndFrom() {
 			setLoading(false);
 		}
 	};
-
 	useEffect(() => {
 		const pickupTimeoutId = setTimeout(() => {
 			if (pickupQuery && activeInput === 'pickup') {
