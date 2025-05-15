@@ -1,5 +1,2 @@
--- AlterEnum
-ALTER TYPE "RideStatus" ADD VALUE 'AVAILABLE';
-
 -- AlterTable
 ALTER TABLE "rides" ALTER COLUMN "status" SET DEFAULT 'AVAILABLE';
