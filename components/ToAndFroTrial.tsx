@@ -13,7 +13,11 @@ import {
 } from '@/components/ui/select';
 import axios from 'axios';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
-import prisma from '@/lib/prisma';
+import { authClient } from '@/lib/auth-client';
+import { usePlaceStore } from '@/hooks/store/usePlace';
+import { useDateTimeStore } from '@/hooks/store/useDateTime';
+import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
+
 interface Location {
 	name: string;
 	address: string;
@@ -24,6 +28,7 @@ interface Location {
 
 interface GeocodeResult {
 	formatted_address: string;
+	name: string;
 	place_id: string;
 	geometry: {
 		location: {
@@ -39,12 +44,18 @@ interface GeocodeResult {
 }
 
 export default function ToAndFrom() {
+	const { data } = authClient.useSession();
+	const session = data;
+
 	const {
 		markerOrigin,
 		markerDestination,
 		setMarkerDestination,
 		setMarkerOrigin,
 	} = useMarkerPositionsStore();
+	const { polyCords } = usePolyLineStore();
+	const { locationAName, locationBName } = usePlaceStore();
+
 	const [pickupQuery, setPickupQuery] = useState('');
 	const [dropoffQuery, setDropoffQuery] = useState('');
 	const [pickupGeocodeResults, setPickupGeocodeResults] = useState<
@@ -126,7 +137,7 @@ export default function ToAndFrom() {
 		inputType: 'pickup' | 'dropoff'
 	) => {
 		const location: Location = {
-			name: result.formatted_address,
+			name: result.name,
 			address: result.formatted_address,
 			latitude: result.geometry.location.lat,
 			longitude: result.geometry.location.lng,
@@ -166,7 +177,7 @@ export default function ToAndFrom() {
 							<Input
 								placeholder="Pickup location"
 								className="pl-12 pr-12 h-14 border"
-								value={pickupQuery}
+								value={pickupQuery || locationAName}
 								onChange={(e) => {
 									setPickupQuery(e.target.value);
 									setActiveInput('pickup');
@@ -216,7 +227,7 @@ export default function ToAndFrom() {
 						<Input
 							placeholder="Dropoff location"
 							className="pl-12 pr-4 h-14 border"
-							value={dropoffQuery}
+							value={dropoffQuery || locationBName}
 							onChange={(e) => {
 								setDropoffQuery(e.target.value);
 								setActiveInput('dropoff');

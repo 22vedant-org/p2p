@@ -22,6 +22,7 @@ import { DatePicker } from './pick-date';
 import { usePlaceStore } from '@/hooks/store/usePlace';
 import { useDateTimeStore } from '@/hooks/store/useDateTime';
 import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
+import { useTotalDistanceStore } from '@/hooks/store/useDistance';
 
 interface Location {
 	name: string;
@@ -60,6 +61,7 @@ export default function ToFrom() {
 	} = useMarkerPositionsStore();
 	const { polyCords } = usePolyLineStore();
 	const { locationAName, locationBName } = usePlaceStore();
+	const { totalDistance } = useTotalDistanceStore();
 	const [pickupQuery, setPickupQuery] = useState('');
 	const [dropoffQuery, setDropoffQuery] = useState('');
 	const [pickupGeocodeResults, setPickupGeocodeResults] = useState<
@@ -182,6 +184,7 @@ export default function ToFrom() {
 				driverId: session?.user.id,
 				rideBio: rideDetails,
 				polyLineCoords: polyCords,
+				totalDistance: totalDistance,
 			});
 
 			if (response.status == 201) {

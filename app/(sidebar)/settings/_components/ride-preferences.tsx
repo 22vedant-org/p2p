@@ -30,7 +30,7 @@ import {
 export default function RidePreferences() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [preferences, setPreferences] = useState({
-		maxDistance: 5,
+		maxDistance: 300,
 		minRating: 4,
 		allowSmoking: false,
 		allowMusic: true,
@@ -77,20 +77,20 @@ export default function RidePreferences() {
 				<div className="space-y-2">
 					<div className="flex items-center">
 						<MapPin className="mr-2 h-4 w-4" />
-						<Label>Maximum pickup distance (kms)</Label>
+						<Label>Maximum pickup distance (meters)</Label>
 					</div>
 					<Slider
 						value={[preferences.maxDistance]}
-						min={1}
-						max={8}
-						step={1}
+						min={100}
+						max={1000}
+						step={100}
 						onValueChange={(value) =>
 							updatePreference('maxDistance', value[0])
 						}
 						className="w-full"
 					/>
 					<p className="text-sm text-muted-foreground">
-						Current: {preferences.maxDistance} kms
+						Current: {preferences.maxDistance} meters
 					</p>
 				</div>
 

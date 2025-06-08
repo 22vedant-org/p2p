@@ -22,7 +22,7 @@ export async function sendEmail({
 	if (!process.env.EMAIL_FROM) {
 		throw new Error('EMAIL_FROM environment variable is not set');
 	}
-	if (!validateWorkEmail) {
+	if (!validateWorkEmail(to)) {
 		console.error(
 			`Invalid Email domain. Use of personal email address is strictly prohibited.`
 		);

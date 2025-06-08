@@ -20,7 +20,7 @@ model User {
   image           String?
   emailVerified   Boolean       @default(false)
   phoneNumber     String?
-  role            String        @default("rider")
+  role            String        @default("Rider")
   gender          Gender?
   companyName     String?
   banned          Boolean?       @default(false)
@@ -107,6 +107,7 @@ model Ride {
   initialDeposit   Float
   rideBio         String?
   polyLineCoords  Json
+  totalDistance   Int
   status          RideStatus    @default(AVAILABLE)
   smartContractAddress  String? 
   createdAt       DateTime      @default(now())

@@ -75,11 +75,11 @@ export default async function RootLayout({
 					>
 						<div className="min-h-screen flex flex-col">
 							<TopbarPrior />
-							<main>
+							<main className="flex-1">
 								{children}
-								<Footer />
 								<Toaster />
 							</main>
+							<Footer />
 						</div>
 					</ThemeProvider>
 				)}

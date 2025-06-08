@@ -6,10 +6,19 @@ const getPasswordSchema = (type: 'password' | 'confirmPassword') =>
 		.min(8, `${type} must be atleast 8 characters`)
 		.max(32, `${type} can not exceed 32 characters`);
 
+const validateWorkEmail = (email: string): boolean => {
+	const personalEmail =
+		/^[^@]+@(gmail|yahoo|hotmail|outlook|aol|icloud)\.(com|net|org)$/i;
+	return !personalEmail.test(email);
+};
 const getEmailSchema = () =>
 	string({ required_error: 'Email is required' })
 		.min(1, 'Email is required')
-		.email('Invalid email');
+		.email('Invalid email')
+		.refine(validateWorkEmail, {
+			message:
+				'Please use your work email. Personal email domains are currently not allowed.',
+		});
 
 const getNameSchema = () =>
 	string({ required_error: 'Name is required' })
