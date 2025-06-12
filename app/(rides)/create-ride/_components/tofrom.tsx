@@ -15,7 +15,6 @@ import {
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
-import { DateTimePicker24hForm } from './pick-date-time';
 import { Textarea } from '@/components/ui/textarea';
 import { authClient } from '@/lib/auth-client';
 import { DatePicker } from './pick-date';
@@ -174,20 +173,68 @@ export default function ToFrom() {
 
 	const onCreateRide = async () => {
 		try {
-			const response = await axios.post('/api/create-ride', {
+			// ✅ Validate that we have marker positions before sending
+			if (!markerOrigin || !markerDestination) {
+				toast({
+					title: 'Location Required',
+					description:
+						'Please select both pickup and dropoff locations.',
+					variant: 'destructive',
+				});
+				return;
+			}
+
+			if (
+				typeof markerOrigin.lng !== 'number' ||
+				typeof markerOrigin.lat !== 'number'
+			) {
+				toast({
+					title: 'Invalid Pickup Location',
+					description: 'Please select a valid pickup location.',
+					variant: 'destructive',
+				});
+				return;
+			}
+
+			if (
+				typeof markerDestination.lng !== 'number' ||
+				typeof markerDestination.lat !== 'number'
+			) {
+				toast({
+					title: 'Invalid Dropoff Location',
+					description: 'Please select a valid dropoff location.',
+					variant: 'destructive',
+				});
+				return;
+			}
+
+			// ✅ Prepare the payload with proper structure
+			const payload = {
 				rideMarkerOrigin: pickupQuery || locationAName,
 				rideMarkerDestination: dropoffQuery || locationBName,
+				markerOrigin: {
+					lng: markerOrigin.lng,
+					lat: markerOrigin.lat,
+				},
+				markerDestination: {
+					lng: markerDestination.lng,
+					lat: markerDestination.lat,
+				},
 				departureTime: date,
 				availableSeats: seats,
-				// pricePerSeat: 10,
 				initialDeposit: initialDeposit,
 				driverId: session?.user.id,
 				rideBio: rideDetails,
 				polyLineCoords: polyCords,
 				totalDistance: totalDistance,
-			});
+			};
 
-			if (response.status == 201) {
+			// ✅ Log the payload for debugging
+			console.log('Sending payload:', JSON.stringify(payload, null, 2));
+
+			const response = await axios.post('/api/create-ride', payload);
+
+			if (response.status === 201) {
 				toast({
 					title: 'Ride Created Successfully',
 					description: 'Your ride has been added to the platform.',
@@ -195,15 +242,23 @@ export default function ToFrom() {
 				});
 			}
 		} catch (error) {
+			console.error('Error creating ride:', error);
+
+			// ✅ Better error handling
+			const errorMessage =
+				error.response?.data?.error ||
+				'There was an error creating your ride. Please try again.';
+			const missingFields = error.response?.data?.missing;
+
 			toast({
 				title: 'Ride Creation Failed',
-				description:
-					'There was an error creating your ride. Please try again.',
+				description: missingFields
+					? `Missing fields: ${missingFields.join(', ')}`
+					: errorMessage,
 				variant: 'destructive',
 			});
 		}
 	};
-
 	return (
 		<div className="max-w-xl mx-auto p-6 space-y-8 overflow-y-scroll">
 			<div className="text-4xl font-bold tracking-tight">
@@ -306,17 +361,6 @@ export default function ToFrom() {
 				</div>
 
 				<div className="grid grid-cols-2 gap-4">
-					{/* <Select defaultValue="today">
-						<SelectTrigger className="h-14 bg-gray-100 border-0 text-black">
-							<Calendar className="w-5 h-5 mr-2" />
-							<SelectValue placeholder="Select date" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="today">Today</SelectItem>
-							<SelectItem value="tomorrow">Tomorrow</SelectItem>
-						</SelectContent>
-					</Select> */}
-					{/* <DateTimePicker24hForm /> */}
 					<DatePicker />
 
 					<Select

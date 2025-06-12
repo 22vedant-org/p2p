@@ -42,7 +42,7 @@ export default function SignUp() {
 			password: '',
 			confirmPassword: '',
 			phoneNumber: '',
-			role: 'Rider',
+			role: 'rider',
 			gender: 'MALE',
 			companyName: '',
 		},

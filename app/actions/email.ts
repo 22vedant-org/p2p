@@ -22,15 +22,15 @@ export async function sendEmail({
 	if (!process.env.EMAIL_FROM) {
 		throw new Error('EMAIL_FROM environment variable is not set');
 	}
-	if (!validateWorkEmail(to)) {
-		console.error(
-			`Invalid Email domain. Use of personal email address is strictly prohibited.`
-		);
-		return {
-			success: false,
-			message: `Please use your work email`,
-		};
-	}
+	// if (!validateWorkEmail(to)) {
+	// 	console.error(
+	// 		`Invalid Email domain. Use of personal email address is strictly prohibited.`
+	// 	);
+	// 	return {
+	// 		success: false,
+	// 		message: `Please use your work email`,
+	// 	};
+	// }
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 	const message = {

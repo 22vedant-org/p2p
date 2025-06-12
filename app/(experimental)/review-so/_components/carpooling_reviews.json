@@ -1,0 +1,421 @@
+{
+	"address": "6fBE38JrANKWtNLJ6esab6fXos2HHnsczRnSS2gSpxAB",
+	"metadata": {
+		"name": "carpooling_reviews",
+		"version": "0.1.0",
+		"spec": "0.1.0",
+		"description": "Created with Anchor"
+	},
+	"instructions": [
+		{
+			"name": "complete_ride",
+			"discriminator": [196, 120, 0, 113, 17, 178, 79, 225],
+			"accounts": [
+				{
+					"name": "ride_account",
+					"writable": true
+				},
+				{
+					"name": "driver",
+					"signer": true
+				}
+			],
+			"args": []
+		},
+		{
+			"name": "get_user_reviews",
+			"discriminator": [184, 215, 35, 143, 121, 27, 248, 36],
+			"accounts": [
+				{
+					"name": "user"
+				}
+			],
+			"args": []
+		},
+		{
+			"name": "initialize_ride",
+			"discriminator": [237, 237, 29, 192, 246, 22, 90, 7],
+			"accounts": [
+				{
+					"name": "ride_account",
+					"writable": true,
+					"pda": {
+						"seeds": [
+							{
+								"kind": "const",
+								"value": [114, 105, 100, 101]
+							},
+							{
+								"kind": "arg",
+								"path": "ride_id"
+							}
+						]
+					}
+				},
+				{
+					"name": "driver",
+					"writable": true,
+					"signer": true
+				},
+				{
+					"name": "system_program",
+					"address": "11111111111111111111111111111111"
+				}
+			],
+			"args": [
+				{
+					"name": "ride_id",
+					"type": "string"
+				},
+				{
+					"name": "driver",
+					"type": "pubkey"
+				},
+				{
+					"name": "max_passengers",
+					"type": "u8"
+				},
+				{
+					"name": "price_per_seat",
+					"type": "u64"
+				},
+				{
+					"name": "start_location",
+					"type": "string"
+				},
+				{
+					"name": "end_location",
+					"type": "string"
+				},
+				{
+					"name": "departure_time",
+					"type": "i64"
+				}
+			]
+		},
+		{
+			"name": "join_ride",
+			"discriminator": [241, 252, 48, 83, 148, 33, 41, 137],
+			"accounts": [
+				{
+					"name": "ride_account",
+					"writable": true
+				},
+				{
+					"name": "passenger",
+					"signer": true
+				}
+			],
+			"args": []
+		},
+		{
+			"name": "report_review",
+			"discriminator": [194, 154, 52, 151, 148, 248, 74, 46],
+			"accounts": [
+				{
+					"name": "review_account",
+					"writable": true
+				},
+				{
+					"name": "reporter",
+					"signer": true
+				}
+			],
+			"args": [
+				{
+					"name": "reason",
+					"type": "string"
+				}
+			]
+		},
+		{
+			"name": "submit_review",
+			"discriminator": [106, 30, 50, 83, 89, 46, 213, 239],
+			"accounts": [
+				{
+					"name": "ride_account"
+				},
+				{
+					"name": "review_account",
+					"writable": true,
+					"pda": {
+						"seeds": [
+							{
+								"kind": "const",
+								"value": [114, 101, 118, 105, 101, 119]
+							},
+							{
+								"kind": "account",
+								"path": "ride_account"
+							},
+							{
+								"kind": "account",
+								"path": "reviewer"
+							}
+						]
+					}
+				},
+				{
+					"name": "reviewer",
+					"writable": true,
+					"signer": true
+				},
+				{
+					"name": "system_program",
+					"address": "11111111111111111111111111111111"
+				}
+			],
+			"args": [
+				{
+					"name": "rating",
+					"type": "u8"
+				},
+				{
+					"name": "comment",
+					"type": "string"
+				},
+				{
+					"name": "review_type",
+					"type": {
+						"defined": {
+							"name": "ReviewType"
+						}
+					}
+				}
+			]
+		}
+	],
+	"accounts": [
+		{
+			"name": "ReviewAccount",
+			"discriminator": [119, 177, 213, 232, 143, 161, 255, 66]
+		},
+		{
+			"name": "RideAccount",
+			"discriminator": [109, 42, 135, 22, 195, 142, 65, 186]
+		}
+	],
+	"errors": [
+		{
+			"code": 6000,
+			"name": "RideIdTooLong",
+			"msg": "Ride ID too long (max 50 characters)"
+		},
+		{
+			"code": 6001,
+			"name": "LocationTooLong",
+			"msg": "Location too long (max 100 characters)"
+		},
+		{
+			"code": 6002,
+			"name": "InvalidPassengerCount",
+			"msg": "Invalid passenger count (must be 1-8)"
+		},
+		{
+			"code": 6003,
+			"name": "RideNotActive",
+			"msg": "Ride is not active"
+		},
+		{
+			"code": 6004,
+			"name": "RideFull",
+			"msg": "Ride is full"
+		},
+		{
+			"code": 6005,
+			"name": "AlreadyJoined",
+			"msg": "Already joined this ride"
+		},
+		{
+			"code": 6006,
+			"name": "DriverCannotJoin",
+			"msg": "Driver cannot join their own ride"
+		},
+		{
+			"code": 6007,
+			"name": "UnauthorizedDriver",
+			"msg": "Unauthorized driver"
+		},
+		{
+			"code": 6008,
+			"name": "InvalidRating",
+			"msg": "Invalid rating (must be 1-5)"
+		},
+		{
+			"code": 6009,
+			"name": "CommentTooLong",
+			"msg": "Comment too long (max 500 characters)"
+		},
+		{
+			"code": 6010,
+			"name": "RideNotCompleted",
+			"msg": "Ride not completed yet"
+		},
+		{
+			"code": 6011,
+			"name": "ReviewerNotParticipant",
+			"msg": "Reviewer did not participate in this ride"
+		},
+		{
+			"code": 6012,
+			"name": "InvalidReviewType",
+			"msg": "Invalid review type for reviewer role"
+		},
+		{
+			"code": 6013,
+			"name": "ReasonTooLong",
+			"msg": "Report reason too long (max 200 characters)"
+		}
+	],
+	"types": [
+		{
+			"name": "ReviewAccount",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "ride_id",
+						"type": "string"
+					},
+					{
+						"name": "reviewer",
+						"type": "pubkey"
+					},
+					{
+						"name": "reviewee",
+						"type": "pubkey"
+					},
+					{
+						"name": "rating",
+						"type": "u8"
+					},
+					{
+						"name": "comment",
+						"type": "string"
+					},
+					{
+						"name": "review_type",
+						"type": {
+							"defined": {
+								"name": "ReviewType"
+							}
+						}
+					},
+					{
+						"name": "created_at",
+						"type": "i64"
+					},
+					{
+						"name": "is_verified",
+						"type": "bool"
+					},
+					{
+						"name": "is_reported",
+						"type": "bool"
+					},
+					{
+						"name": "report_reason",
+						"type": {
+							"option": "string"
+						}
+					}
+				]
+			}
+		},
+		{
+			"name": "ReviewType",
+			"type": {
+				"kind": "enum",
+				"variants": [
+					{
+						"name": "DriverReview"
+					},
+					{
+						"name": "PassengerReview"
+					}
+				]
+			}
+		},
+		{
+			"name": "RideAccount",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "ride_id",
+						"type": "string"
+					},
+					{
+						"name": "driver",
+						"type": "pubkey"
+					},
+					{
+						"name": "max_passengers",
+						"type": "u8"
+					},
+					{
+						"name": "current_passengers",
+						"type": "u8"
+					},
+					{
+						"name": "price_per_seat",
+						"type": "u64"
+					},
+					{
+						"name": "start_location",
+						"type": "string"
+					},
+					{
+						"name": "end_location",
+						"type": "string"
+					},
+					{
+						"name": "departure_time",
+						"type": "i64"
+					},
+					{
+						"name": "status",
+						"type": {
+							"defined": {
+								"name": "RideStatus"
+							}
+						}
+					},
+					{
+						"name": "created_at",
+						"type": "i64"
+					},
+					{
+						"name": "completed_at",
+						"type": {
+							"option": "i64"
+						}
+					},
+					{
+						"name": "passengers",
+						"type": {
+							"vec": "pubkey"
+						}
+					}
+				]
+			}
+		},
+		{
+			"name": "RideStatus",
+			"type": {
+				"kind": "enum",
+				"variants": [
+					{
+						"name": "Active"
+					},
+					{
+						"name": "Completed"
+					},
+					{
+						"name": "Cancelled"
+					}
+				]
+			}
+		}
+	]
+}

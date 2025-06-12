@@ -16,6 +16,7 @@ import {
 import { DatePicker } from './pick-date';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
+import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 
 interface Location {
 	name: string;
@@ -43,7 +44,9 @@ interface GeocodeResult {
 
 interface rideDataProps {
 	rideMarkerOrigin: string;
+	startLocationCoord: [number, number];
 	rideMarkerDestination: string;
+	endLocationCoord: [number, number];
 	departureTime: string;
 	availableSeats: number;
 	pricePerSeat: number;
@@ -57,7 +60,9 @@ async function createRide(rideData: rideDataProps, userId: string | undefined) {
 	try {
 		const response = await axios.post('/api/create-ride', {
 			rideMarkerOrigin: rideData.rideMarkerOrigin,
+			startLocationCoord: rideData.startLocationCoord,
 			rideMarkerDestination: rideData.rideMarkerDestination,
+			endLocationCoord: rideData.endLocationCoord,
 			departureTime: rideData.departureTime,
 			availableSeats: rideData.availableSeats,
 			pricePerSeat: rideData.pricePerSeat,
@@ -102,6 +107,12 @@ export default function ToAndFrom() {
 		setRideMarkerDestination,
 		setRideMarkerOrigin,
 	} = useRideMarkerPositionStore();
+	const {
+		markerOrigin,
+		markerDestination,
+		setMarkerDestination,
+		setMarkerOrigin,
+	} = useMarkerPositionsStore();
 	const { data } = authClient.useSession();
 	const session = data;
 	const [pickupQuery, setPickupQuery] = useState('');
@@ -345,10 +356,18 @@ export default function ToAndFrom() {
 							rideMarkerOrigin.lat.toString() +
 							', ' +
 							rideMarkerOrigin.lng.toString(),
+						startLocationCoord: [
+							markerOrigin.lng,
+							markerOrigin.lat,
+						],
 						rideMarkerDestination:
 							rideMarkerDestination.lat.toString() +
 							', ' +
 							rideMarkerDestination.lng.toString(),
+						endLocationCoord: [
+							markerDestination.lng,
+							markerDestination.lat,
+						],
 						availableSeats: 3,
 						departureTime: Date().toString(),
 						pricePerSeat: 123,

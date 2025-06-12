@@ -5,7 +5,6 @@ import { BarChart3, Zap, Shield, Layers, Users, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function FeaturesGrid() {
-	// Animation variants
 	const container = {
 		hidden: { opacity: 0 },
 		show: {
@@ -22,55 +21,54 @@ export default function FeaturesGrid() {
 		show: { opacity: 1, y: 0, transition: { type: 'spring', damping: 15 } },
 	};
 
-	// Feature card data
 	const features = [
 		{
-			title: 'Real-time Analytics',
+			title: 'Automated Ride Payments',
 			description:
-				'Process and visualize data instantly with our powerful analytics engine. Make informed decisions faster than ever before.',
-			icon: <BarChart3 className="w-6 h-6" />,
-			color: 'from-purple-500 to-indigo-700',
-			span: 'md:col-span-2 md:row-span-1',
-		},
-		{
-			title: 'Lightning Fast Performance',
-			description:
-				'Built with speed in mind. Our optimized algorithms ensure your application runs smoothly even with massive datasets.',
+				'Smart contract-powered transactions ensure secure and transparent payments between drivers and riders, without middlemen.',
 			icon: <Zap className="w-6 h-6" />,
 			color: 'from-amber-500 to-orange-700',
 			span: 'md:col-span-1 md:row-span-2',
 		},
 		{
-			title: 'Enterprise Security',
+			title: 'Solana Blockchain Integration',
 			description:
-				'Bank-level encryption and security protocols keep your data safe. Compliant with industry standards including GDPR, HIPAA, and SOC2.',
+				'Leverages Solana’s lightning-fast and low-cost network for handling ride bookings, token transfers, and real-time updates.',
+			icon: <Globe className="w-6 h-6" />,
+			color: 'from-blue-600 to-indigo-700',
+			span: 'md:col-span-2 md:row-span-1',
+		},
+		{
+			title: 'Verified User Identities',
+			description:
+				'Only allows registrations using organizational or institutional email domains. Public domains like Gmail are automatically rejected.',
 			icon: <Shield className="w-6 h-6" />,
 			color: 'from-emerald-500 to-green-700',
 			span: 'md:col-span-1 md:row-span-1',
 		},
 		{
-			title: 'Scalable Architecture',
+			title: 'Decentralized Review System',
 			description:
-				'From startups to enterprises, our platform scales with your needs. Handle millions of users without performance degradation.',
-			icon: <Layers className="w-6 h-6" />,
-			color: 'from-blue-500 to-cyan-700',
-			span: 'md:col-span-1 md:row-span-1',
-		},
-		{
-			title: 'Collaborative Workspace',
-			description:
-				'Work together seamlessly with your team. Real-time updates, commenting, and sharing make collaboration effortless.',
+				'Users can leave tamper-proof reviews after every ride. Feedback is stored on-chain for transparency and trust.',
 			icon: <Users className="w-6 h-6" />,
 			color: 'from-rose-500 to-pink-700',
 			span: 'md:col-span-1 md:row-span-1',
 		},
 		{
-			title: 'Global Infrastructure',
+			title: 'Lightning Fast Booking Engine',
 			description:
-				'Deployed across multiple regions worldwide, ensuring low latency and high availability for users everywhere. 99.99% uptime guaranteed.',
-			icon: <Globe className="w-6 h-6" />,
-			color: 'from-teal-500 to-cyan-700',
+				'Enjoy instant ride matching and transaction finality with our ultra-responsive backend, optimized for real-time use cases.',
+			icon: <BarChart3 className="w-6 h-6" />,
+			color: 'from-yellow-500 to-orange-600',
 			span: 'md:col-span-2 md:row-span-1',
+		},
+		{
+			title: 'Scalable Ride Infrastructure',
+			description:
+				'Supports thousands of concurrent rides, payments, and verifications — thanks to modular architecture and distributed execution.',
+			icon: <Layers className="w-6 h-6" />,
+			color: 'from-purple-600 to-fuchsia-700',
+			span: 'md:col-span-1 md:row-span-1',
 		},
 	];
 
@@ -92,8 +90,8 @@ export default function FeaturesGrid() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.5, delay: 0.2 }}
 					>
-						Everything you need to build, deploy, and scale your
-						application
+						Everything you need to build a secure, scalable, and
+						seamless blockchain-based carpooling platform.
 					</motion.p>
 				</div>
 
@@ -114,12 +112,10 @@ export default function FeaturesGrid() {
 								transition: { type: 'spring', stiffness: 300 },
 							}}
 						>
-							{/* Gradient background */}
 							<div
 								className={`absolute inset-0 bg-gray-400 bg-opacity-10`}
 							></div>
 
-							{/* Content */}
 							<div className="p-8 h-full flex flex-col">
 								<div className="mb-6">
 									<motion.div

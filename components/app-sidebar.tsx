@@ -120,20 +120,20 @@ const data = {
 		},
 		{
 			title: 'Reviews',
-			url: '#',
+			url: '/',
 			icon: Star,
 			items: [
 				{
 					title: 'My Reviews',
-					url: '/reviews',
+					url: '/review-so/list-reviews',
 				},
 				{
 					title: 'Post a Review',
-					url: '/reviews/#post',
+					url: '/review-so',
 				},
 				{
-					title: 'Verify Reviews',
-					url: '#/reviews/#verify',
+					title: 'Verify Rides',
+					url: '#/review-so/fetch-ride',
 				},
 			],
 		},

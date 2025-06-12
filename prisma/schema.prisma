@@ -100,7 +100,9 @@ model Wallet {
 model Ride {
   id              String      @id @default(cuid())
   startLocation   String
+  startLocationCoord  Float[]
   endLocation     String
+  endLocationCoord  Float[]
   departureTime   String
   availableSeats  Int
   // pricePerSeat    Float
