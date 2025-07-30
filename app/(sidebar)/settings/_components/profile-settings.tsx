@@ -50,6 +50,7 @@ export default function ProfileSettings() {
 
 	const { data } = authClient.useSession();
 	const session = data;
+
 	const defaultValues: Partial<ProfileFormValues> = {
 		name: session?.user.name,
 		email: session?.user.email,

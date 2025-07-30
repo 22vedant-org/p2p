@@ -24,10 +24,10 @@ export default function ConnectWalletButton() {
 	// }
 	useEffect(() => {
 		if (publicKey) {
-			(async function getBalanceEvery100Seconds() {
+			(async function getBalanceEvery50Seconds() {
 				const newBalance = await connection.getBalance(publicKey);
 				setBalance(newBalance / LAMPORTS_PER_SOL);
-				setTimeout(getBalanceEvery100Seconds, 100000);
+				setTimeout(getBalanceEvery50Seconds, 50000);
 			})();
 
 			// handleUpdateUserWalletAddress()
