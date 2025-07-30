@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import {
@@ -12,7 +13,8 @@ import axios from 'axios';
 import polyline from '@mapbox/polyline';
 import { Feature, LineString } from 'geojson';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
-
+import { usePlaceStore } from '@/hooks/store/usePlace';
+import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
 const OlaMaplibre = () => {
 	const mapRef = useRef<HTMLDivElement>(null);
 	const mapInstance = useRef<Map | null>(null); // Reference to the map instance
@@ -24,13 +26,14 @@ const OlaMaplibre = () => {
 		setMarkerDestination,
 		setMarkerOrigin,
 	} = useMarkerPositionsStore();
-
+	const { setLocationA, setLocationB } = usePlaceStore();
+	const { polyCords, setPolyCords } = usePolyLineStore();
 	// const [markerPositions, setMarkerPositions] = useState({
 	// 	markerOrigin: { lng: 73.847466, lat: 18.530823 },
 	// 	markerDestination: { lng: 73.8547, lat: 18.4655 },
 	// });
 
-	const [polyCords, setPolyCords] = useState<[number, number][]>([]);
+	// const [polyCords, setPolyCords] = useState<[number, number][]>([]);
 
 	const sendParamsOla = useCallback(async () => {
 		try {
@@ -56,6 +59,55 @@ const OlaMaplibre = () => {
 			throw error;
 		}
 	}, [markerOrigin, markerDestination]);
+
+	const reverseGeocodeMarkerOrigin = useCallback(async (marker) => {
+		try {
+			const response = await axios.get(
+				'https://api.olamaps.io/places/v1/reverse-geocode',
+				{
+					params: {
+						api_key: process.env.NEXT_PUBLIC_OLA_API_KEY,
+						latlng: `${marker.lat},${marker.lng}`,
+					},
+				}
+			);
+
+			const result = response.data.results?.[0];
+			if (result) {
+				setMarkerOrigin({
+					lng: result.geometry.location.lng,
+					lat: result.geometry.location.lat,
+				});
+				setLocationA(result.name);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}, []);
+	const reverseGeocodeMarkerDestination = useCallback(async (marker) => {
+		try {
+			const response = await axios.get(
+				'https://api.olamaps.io/places/v1/reverse-geocode',
+				{
+					params: {
+						api_key: process.env.NEXT_PUBLIC_OLA_API_KEY,
+						latlng: `${marker.lat},${marker.lng}`,
+					},
+				}
+			);
+
+			const result = response.data.results?.[0];
+			if (result) {
+				setMarkerDestination({
+					lng: result.geometry.location.lng,
+					lat: result.geometry.location.lat,
+				});
+				setLocationB(result.name);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}, []);
 
 	useEffect(() => {
 		sendParamsOla();
@@ -83,6 +135,8 @@ const OlaMaplibre = () => {
 				return { url, resourceType };
 			},
 		});
+
+		// myMap.scrollZoom.disable();
 
 		myMap.addControl(
 			new NavigationControl({
@@ -113,11 +167,18 @@ const OlaMaplibre = () => {
 
 		originMarkerRef.current.on('dragend', () => {
 			const lngLat = originMarkerRef.current!.getLngLat();
+			console.log(lngLat);
+
 			setMarkerOrigin({ lng: lngLat.lng, lat: lngLat.lat });
+			reverseGeocodeMarkerOrigin({ lng: lngLat.lng, lat: lngLat.lat });
 		});
 		destinationMarkerRef.current.on('dragend', () => {
 			const lngLat = destinationMarkerRef.current!.getLngLat();
 			setMarkerDestination({ lng: lngLat.lng, lat: lngLat.lat });
+			reverseGeocodeMarkerDestination({
+				lng: lngLat.lng,
+				lat: lngLat.lat,
+			});
 		});
 
 		myMap.addControl(
@@ -131,7 +192,7 @@ const OlaMaplibre = () => {
 		myMap.on('style.load', () => {
 			console.log('Style loaded successfully.');
 		});
-	}, []);
+	}, [markerOrigin, markerDestination]);
 
 	useEffect(() => {
 		if (originMarkerRef.current) {

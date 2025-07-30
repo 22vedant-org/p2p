@@ -1,25 +1,52 @@
-import { object, string } from 'zod';
+import { phoneNumber } from 'better-auth/plugins';
+import { object, string, enum as enum_ } from 'zod';
 
 const getPasswordSchema = (type: 'password' | 'confirmPassword') =>
 	string({ required_error: `${type} is required` })
 		.min(8, `${type} must be atleast 8 characters`)
 		.max(32, `${type} can not exceed 32 characters`);
 
+const validateWorkEmail = (email: string): boolean => {
+	const personalEmail =
+		/^[^@]+@(gmail|yahoo|hotmail|outlook|aol|icloud)\.(com|net|org)$/i;
+	return !personalEmail.test(email);
+};
 const getEmailSchema = () =>
 	string({ required_error: 'Email is required' })
 		.min(1, 'Email is required')
-		.email('Invalid email');
+		.email('Invalid email')
+		.refine(validateWorkEmail, {
+			message:
+				'Please use your work email. Personal email domains are currently not allowed.',
+		});
 
 const getNameSchema = () =>
 	string({ required_error: 'Name is required' })
 		.min(1, 'Name is required')
 		.max(50, 'Name must be less than 50 characters');
 
+const getPhoneNumberSchema = () =>
+	string()
+		.min(10, 'Please enter a valid phone number')
+		.max(10, 'Please enter a valid phone number')
+		.optional()
+		.nullable();
+
+const getRoleSchema = () => enum_(['Rider', 'Driver']);
+
+const getGenderSchema = () => enum_(['MALE', 'FEMALE', 'OTHER']);
+
+const getCompanyNameSchema = () => string().optional();
+
 export const signUpSchema = object({
 	name: getNameSchema(),
 	email: getEmailSchema(),
 	password: getPasswordSchema('password'),
 	confirmPassword: getPasswordSchema('confirmPassword'),
+	phoneNumber: getPhoneNumberSchema(),
+	role: getRoleSchema(),
+	gender: getGenderSchema(),
+	companyName: getCompanyNameSchema(),
 }).refine((data) => data.password === data.confirmPassword, {
 	message: "Passwords don't match",
 	path: ['confirmPassword'],

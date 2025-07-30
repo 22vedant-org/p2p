@@ -7,5 +7,14 @@ interface DateTime {
 
 export const useDateTimeStore = create<DateTime>()((set) => ({
 	date: new Date(),
-	setDate: (time) => set((state) => ({ ...state, date: time })),
+	setDate: (time) => {
+		const normalized = new Date(
+			time.getFullYear(),
+			time.getMonth(),
+			time.getDate(),
+			time.getHours(),
+			time.getMinutes()
+		);
+		set((state) => ({ ...state, date: normalized }));
+	},
 }));

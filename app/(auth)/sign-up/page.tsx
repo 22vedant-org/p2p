@@ -25,30 +25,10 @@ import Link from 'next/link';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signUpSchema } from '@/lib/zod';
 import { authClient } from '@/lib/auth-client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-
-// Updated schema based on User model
-const signUpSchema = z
-	.object({
-		name: z.string().min(2, 'Name must be at least 2 characters'),
-		email: z.string().email('Please enter a valid email'),
-		password: z.string().min(8, 'Password must be at least 8 characters'),
-		confirmPassword: z.string(),
-		phoneNumber: z
-			.string()
-			.min(10, 'Please enter a valid phone number')
-			.optional()
-			.nullable(),
-		role: z.enum(['rider', 'driver']),
-		gender: z.enum(['MALE', 'FEMALE', 'OTHER']).optional().nullable(),
-		companyName: z.string().optional().nullable(),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords don't match",
-		path: ['confirmPassword'],
-	});
 
 export default function SignUp() {
 	const [pending, setPending] = useState(false);
@@ -63,7 +43,7 @@ export default function SignUp() {
 			confirmPassword: '',
 			phoneNumber: '',
 			role: 'rider',
-			gender: null,
+			gender: 'MALE',
 			companyName: '',
 		},
 	});
@@ -105,7 +85,7 @@ export default function SignUp() {
 
 	// Show company name field only when role is driver
 	const watchRole = form.watch('role');
-	const showCompanyField = watchRole === 'driver';
+	const showCompanyField = watchRole === 'Driver';
 
 	return (
 		<div className="grow flex items-center justify-center p-4">
@@ -196,10 +176,10 @@ export default function SignUp() {
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
-													<SelectItem value="rider">
+													<SelectItem value="Rider">
 														Rider
 													</SelectItem>
-													<SelectItem value="driver">
+													<SelectItem value="Driver">
 														Driver
 													</SelectItem>
 												</SelectContent>

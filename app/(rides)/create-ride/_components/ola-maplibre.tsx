@@ -15,6 +15,8 @@ import { Feature, LineString } from 'geojson';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 import { usePlaceStore } from '@/hooks/store/usePlace';
 import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
+import { useTotalDistanceStore } from '@/hooks/store/useDistance';
+
 const OlaMaplibre = () => {
 	const mapRef = useRef<HTMLDivElement>(null);
 	const mapInstance = useRef<Map | null>(null); // Reference to the map instance
@@ -28,12 +30,7 @@ const OlaMaplibre = () => {
 	} = useMarkerPositionsStore();
 	const { setLocationA, setLocationB } = usePlaceStore();
 	const { polyCords, setPolyCords } = usePolyLineStore();
-	// const [markerPositions, setMarkerPositions] = useState({
-	// 	markerOrigin: { lng: 73.847466, lat: 18.530823 },
-	// 	markerDestination: { lng: 73.8547, lat: 18.4655 },
-	// });
-
-	// const [polyCords, setPolyCords] = useState<[number, number][]>([]);
+	const { setTotalDistance } = useTotalDistanceStore();
 
 	const sendParamsOla = useCallback(async () => {
 		try {
@@ -50,6 +47,7 @@ const OlaMaplibre = () => {
 			);
 			if (response.data['status'] === 'SUCCESS') {
 				const routes = response.data.routes;
+				setTotalDistance(routes[0].legs[0].distance);
 				const polyLine = routes[0].overview_polyline;
 				const decoded = polyline.decode(polyLine);
 				setPolyCords(decoded.map(([lat, lng]) => [lng, lat])); // Reverse coordinates for GeoJSON

@@ -1,0 +1,267 @@
+const IDL = {
+	address: '3T2QvjEBr66MceNjgP1dBqPEYTGjBU7G2P9QfoLQgX6b',
+	metadata: {
+		name: 'ride_review_system',
+		version: '0.1.0',
+		spec: '0.1.0',
+		description: 'Created with Anchor',
+	},
+	instructions: [
+		{
+			name: 'create_ride',
+			discriminator: [148, 15, 25, 160, 176, 215, 211, 58],
+			accounts: [
+				{
+					name: 'ride',
+					writable: true,
+					pda: {
+						seeds: [
+							{
+								kind: 'const',
+								value: [114, 105, 100, 101],
+							},
+							{
+								kind: 'arg',
+								path: 'ride_id',
+							},
+						],
+					},
+				},
+				{
+					name: 'authority',
+					writable: true,
+					signer: true,
+				},
+				{
+					name: 'system_program',
+					address: '11111111111111111111111111111111',
+				},
+			],
+			args: [
+				{
+					name: 'ride_id',
+					type: 'string',
+				},
+				{
+					name: 'driver_name',
+					type: 'string',
+				},
+				{
+					name: 'route',
+					type: 'string',
+				},
+				{
+					name: 'vehicle_type',
+					type: 'string',
+				},
+			],
+		},
+		{
+			name: 'get_ride_reviews',
+			discriminator: [53, 134, 18, 90, 65, 93, 226, 11],
+			accounts: [
+				{
+					name: 'ride',
+				},
+			],
+			args: [],
+		},
+		{
+			name: 'initialize',
+			discriminator: [175, 175, 109, 31, 13, 152, 155, 237],
+			accounts: [
+				{
+					name: 'review_system',
+					writable: true,
+					signer: true,
+				},
+				{
+					name: 'authority',
+					writable: true,
+					signer: true,
+				},
+				{
+					name: 'system_program',
+					address: '11111111111111111111111111111111',
+				},
+			],
+			args: [],
+		},
+		{
+			name: 'submit_review',
+			discriminator: [106, 30, 50, 83, 89, 46, 213, 239],
+			accounts: [
+				{
+					name: 'review',
+					writable: true,
+					pda: {
+						seeds: [
+							{
+								kind: 'const',
+								value: [114, 101, 118, 105, 101, 119],
+							},
+							{
+								kind: 'account',
+								path: 'reviewer',
+							},
+							{
+								kind: 'account',
+								path: 'ride',
+							},
+						],
+					},
+				},
+				{
+					name: 'ride',
+					writable: true,
+				},
+				{
+					name: 'review_system',
+					writable: true,
+				},
+				{
+					name: 'reviewer',
+					writable: true,
+					signer: true,
+				},
+				{
+					name: 'system_program',
+					address: '11111111111111111111111111111111',
+				},
+			],
+			args: [
+				{
+					name: 'rating',
+					type: 'u8',
+				},
+				{
+					name: 'comment',
+					type: 'string',
+				},
+			],
+		},
+	],
+	accounts: [
+		{
+			name: 'Review',
+			discriminator: [124, 63, 203, 215, 226, 30, 222, 15],
+		},
+		{
+			name: 'ReviewSystem',
+			discriminator: [65, 188, 237, 238, 94, 251, 152, 24],
+		},
+		{
+			name: 'Ride',
+			discriminator: [227, 31, 10, 115, 113, 207, 13, 112],
+		},
+	],
+	errors: [
+		{
+			code: 6000,
+			name: 'RideIdTooLong',
+			msg: 'Ride ID is too long (max 50 characters)',
+		},
+		{
+			code: 6001,
+			name: 'DriverNameTooLong',
+			msg: 'Driver name is too long (max 100 characters)',
+		},
+		{
+			code: 6002,
+			name: 'RouteTooLong',
+			msg: 'Route is too long (max 200 characters)',
+		},
+		{
+			code: 6003,
+			name: 'InvalidRating',
+			msg: 'Invalid rating (must be between 1 and 5)',
+		},
+		{
+			code: 6004,
+			name: 'CommentTooLong',
+			msg: 'Comment is too long (max 500 characters)',
+		},
+	],
+	types: [
+		{
+			name: 'Review',
+			type: {
+				kind: 'struct',
+				fields: [
+					{
+						name: 'reviewer',
+						type: 'pubkey',
+					},
+					{
+						name: 'ride',
+						type: 'pubkey',
+					},
+					{
+						name: 'rating',
+						type: 'u8',
+					},
+					{
+						name: 'comment',
+						type: 'string',
+					},
+					{
+						name: 'timestamp',
+						type: 'i64',
+					},
+				],
+			},
+		},
+		{
+			name: 'ReviewSystem',
+			type: {
+				kind: 'struct',
+				fields: [
+					{
+						name: 'authority',
+						type: 'pubkey',
+					},
+					{
+						name: 'total_reviews',
+						type: 'u64',
+					},
+				],
+			},
+		},
+		{
+			name: 'Ride',
+			type: {
+				kind: 'struct',
+				fields: [
+					{
+						name: 'ride_id',
+						type: 'string',
+					},
+					{
+						name: 'driver_name',
+						type: 'string',
+					},
+					{
+						name: 'route',
+						type: 'string',
+					},
+					{
+						name: 'vehicle_type',
+						type: 'string',
+					},
+					{
+						name: 'total_reviews',
+						type: 'u32',
+					},
+					{
+						name: 'average_rating',
+						type: 'u8',
+					},
+					{
+						name: 'created_at',
+						type: 'i64',
+					},
+				],
+			},
+		},
+	],
+};

@@ -72,13 +72,6 @@ const connectedWallets = [
 		isDefault: true,
 		network: 'Ethereum',
 	},
-	{
-		id: '2',
-		name: 'Savings Wallet',
-		address: '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199',
-		isDefault: false,
-		network: 'Polygon',
-	},
 ];
 
 export default function WalletSettings() {
