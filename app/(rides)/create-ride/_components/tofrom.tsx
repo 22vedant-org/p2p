@@ -22,6 +22,10 @@ import { usePlaceStore } from '@/hooks/store/usePlace';
 import { useDateTimeStore } from '@/hooks/store/useDateTime';
 import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
 import { useTotalDistanceStore } from '@/hooks/store/useDistance';
+import { BN } from '@coral-xyz/anchor';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { useEscrowProgram } from '@/app/(experimental)/escrow/_components/hooks/useEscrowProgram';
 
 interface Location {
 	name: string;
@@ -52,6 +56,10 @@ export default function ToFrom() {
 	const { toast } = useToast();
 	const { data } = authClient.useSession();
 	const session = data;
+
+	const { publicKey } = useWallet();
+	const { createEscrow } = useEscrowProgram();
+
 	const {
 		markerOrigin,
 		markerDestination,
@@ -80,7 +88,10 @@ export default function ToFrom() {
 	const [seats, setSeats] = useState('1');
 	const [rideDetails, setRideDetails] = useState('');
 	const [initialDeposit, setInitialDeposit] = useState(0.0);
+	const [driverDeposit, setDriverDeposit] = useState(0.0);
+	const [pricePerSeat, setPricePerSeat] = useState(0.0);
 	const { date } = useDateTimeStore();
+
 	const forwardGeocoding = async (
 		searchQuery: string,
 		inputType: 'pickup' | 'dropoff'
@@ -174,11 +185,26 @@ export default function ToFrom() {
 	const onCreateRide = async () => {
 		try {
 			// ✅ Validate that we have marker positions before sending
-			if (!markerOrigin || !markerDestination) {
+			if (
+				!markerOrigin ||
+				!markerDestination ||
+				!publicKey ||
+				!createEscrow
+			) {
 				toast({
 					title: 'Location Required',
 					description:
 						'Please select both pickup and dropoff locations.',
+					variant: 'destructive',
+				});
+				return;
+			}
+
+			if (driverDeposit <= 0 || pricePerSeat <= 0) {
+				toast({
+					title: 'Invalid Amount',
+					description:
+						'Driver deposit and price per seat must be greater than 0.',
 					variant: 'destructive',
 				});
 				return;
@@ -208,6 +234,46 @@ export default function ToFrom() {
 				return;
 			}
 
+			const rideId = new BN(Date.now());
+			const perSeatPriceLamports = new BN(
+				pricePerSeat * LAMPORTS_PER_SOL
+			);
+			const driverSecurityDepositLamports = new BN(
+				driverDeposit * LAMPORTS_PER_SOL
+			);
+			const riderSecurityDepositLamports = perSeatPriceLamports;
+
+			let escrowPDA;
+			try {
+				toast({
+					title: 'Creating On-Chain Escrow',
+					description:
+						'Please approve the transaction in your wallet.',
+				});
+				const { transaction, escrowPDA: pda } = await createEscrow(
+					rideId,
+					perSeatPriceLamports,
+					driverSecurityDepositLamports,
+					riderSecurityDepositLamports
+				);
+				escrowPDA = pda;
+
+				toast({
+					title: 'On-Chain Escrow Created!',
+					description: `Transaction Successful.`,
+					variant: 'default',
+				});
+			} catch (solanaError) {
+				console.error('Solana transaction failed:', solanaError);
+				toast({
+					title: 'Solana Transaction Failed',
+					description:
+						'Could not create the on-chain escrow. Please check your wallet and try again.',
+					variant: 'destructive',
+				});
+				return; // Stop execution if on-chain part fails
+			}
+
 			// ✅ Prepare the payload with proper structure
 			const payload = {
 				rideMarkerOrigin: pickupQuery || locationAName,
@@ -223,14 +289,19 @@ export default function ToFrom() {
 				departureTime: date,
 				availableSeats: seats,
 				initialDeposit: initialDeposit,
+				pricePerSeat: pricePerSeat,
 				driverId: session?.user.id,
 				rideBio: rideDetails,
 				polyLineCoords: polyCords,
 				totalDistance: totalDistance,
+				escrowAddress: escrowPDA.toBase58(),
+				rideId: rideId.toString(),
+				driverPublicKey: publicKey.toBase58(),
 			};
 
 			// ✅ Log the payload for debugging
-			console.log('Sending payload:', JSON.stringify(payload, null, 2));
+			// console.log('Sending payload:', JSON.stringify(payload, null, 2));
+			toast({ title: 'Saving Ride Details...' });
 
 			const response = await axios.post('/api/create-ride', payload);
 
@@ -380,7 +451,37 @@ export default function ToFrom() {
 						</SelectContent>
 					</Select>
 				</div>
+
 				<div className="grid grid-cols-2 gap-4">
+					<div className="relative">
+						<Input
+							type="number"
+							placeholder="Driver Deposit"
+							className="h-14 pl-12 pr-12"
+							onChange={(e) =>
+								setDriverDeposit(parseFloat(e.target.value))
+							}
+						/>
+						<span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">
+							SOL
+						</span>
+					</div>
+					<div className="relative">
+						<Input
+							type="number"
+							placeholder="Price per Seat"
+							className="h-14 pl-12 pr-12"
+							onChange={(e) =>
+								setPricePerSeat(parseFloat(e.target.value))
+							}
+						/>
+						<span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">
+							SOL
+						</span>
+					</div>
+				</div>
+
+				{/* <div className="grid grid-cols-2 gap-4">
 					<Input
 						placeholder="Initial Deposit"
 						className="h-14 pl-12 pr-12"
@@ -398,7 +499,7 @@ export default function ToFrom() {
 							<SelectItem value="SOL">SOL</SelectItem>
 						</SelectContent>
 					</Select>
-				</div>
+				</div> */}
 
 				<Textarea
 					placeholder="Write details related to the ride."

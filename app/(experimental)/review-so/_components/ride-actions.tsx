@@ -203,7 +203,7 @@ export const RideActions: React.FC<RideActionsProps> = ({
 		computedValues;
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-6">
+		<div className="rounded-lg shadow-md p-6">
 			{/* Ride Information */}
 			<div className="mb-6">
 				<div className="flex items-center justify-between mb-4">

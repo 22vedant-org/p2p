@@ -17,6 +17,12 @@ import { authClient } from '@/lib/auth-client';
 import { usePlaceStore } from '@/hooks/store/usePlace';
 import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
 import dynamic from 'next/dynamic';
+import RideDetailComponent from './ride-detail-component'; // Import the updated component
+
+import { useEscrowProgram } from '@/app/(experimental)/escrow/_components/hooks/useEscrowProgram';
+import { BN } from '@coral-xyz/anchor';
+import { PublicKey } from '@solana/web3.js';
+import { toast } from 'sonner';
 
 const ChooseRide = dynamic(() => import('./choose-ride'), {
 	ssr: false,
@@ -48,13 +54,17 @@ interface GeocodeResult {
 	}[];
 }
 
-interface RideSearchResult {
-	success: boolean;
-	rides: Ride[];
-	totalRides: number;
-	proximitySearch: boolean;
-	radius: number;
-	userLocation: any;
+interface Driver {
+	id: string;
+	name: string;
+	image?: string;
+	role: string;
+}
+
+interface RideRequest {
+	id: string;
+	seats: number;
+	status: string;
 }
 
 interface Ride {
@@ -64,32 +74,36 @@ interface Ride {
 	startLocationCoord: number[];
 	endLocationCoord: number[];
 	departureTime: string;
-	estimatedArrivalTime: string;
+	estimatedArrivalTime?: string;
 	availableSeats: number;
 	pricePerSeat: number;
 	status: string;
-	vehicleType: string;
+	vehicleType?: string;
 	vehicleModel?: string;
 	vehicleColor?: string;
 	licensePlate?: string;
 	polyLineCoords?: any[];
 	distanceFromUser?: number;
-	driver: {
-		id: string;
-		name: string;
-		image?: string;
-		role: string;
-	};
-	rideRequests: {
-		id: string;
-		seats: number;
-		status: string;
-	}[];
+	driverPublicKey: string | null;
+	rideId: string | null;
+	driver: Driver;
+	rideRequests: RideRequest[];
+}
+
+interface RideSearchResult {
+	success: boolean;
+	rides: Ride[];
+	totalRides: number;
+	proximitySearch: boolean;
+	radius: number;
+	userLocation: any;
 }
 
 export default function ToAndFrom() {
 	const { data } = authClient.useSession();
 	const session = data;
+
+	const { joinRide: joinEscrowRide } = useEscrowProgram();
 
 	const {
 		markerOrigin,
@@ -122,112 +136,14 @@ export default function ToAndFrom() {
 	const [rideResults, setRideResults] = useState<RideSearchResult | null>(
 		null
 	);
-	const [expandedRides, setExpandedRides] = useState<Record<string, boolean>>(
-		{}
-	);
 	const [showResults, setShowResults] = useState(false);
-
-	const handleRideSearch = async () => {
-		// Validate required fields
-		if (!pickupQuery && !locationAName) {
-			alert('Please select a pickup location');
-			return;
-		}
-
-		if (!dropoffQuery && !locationBName) {
-			alert('Please select a dropoff location');
-			return;
-		}
-
-		setSearchingRides(true);
-		try {
-			const requestBody = {
-				pickupQuery: pickupQuery || locationAName,
-				dropoffQuery: dropoffQuery || locationBName,
-				departureTime:
-					selectedDate === 'today'
-						? new Date().toISOString()
-						: new Date(
-								Date.now() + 24 * 60 * 60 * 1000
-						  ).toISOString(),
-				markerOrigin: markerOrigin,
-				markerDestination: markerDestination,
-				proximityRadius: 5, // 5km default radius
-				seats: Number.parseInt(seats),
-			};
-
-			console.log('Searching rides with params:', requestBody);
-
-			const response = await axios.post('/api/find-ride', requestBody, {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-
-			const data: RideSearchResult = response.data;
-			setRideResults(data);
-
-			console.log('Ride search results:', data);
-
-			// You can handle the results here - maybe navigate to a results page
-			// or update a global state to show the results
-			if (data.success) {
-				setShowResults(true);
-			} else {
-				alert('No rides found for your search criteria');
-			}
-		} catch (error) {
-			console.error('Error searching for rides:', error);
-
-			if (axios.isAxiosError(error)) {
-				const errorMessage =
-					error.response?.data?.error || 'Failed to search for rides';
-				alert(`Error: ${errorMessage}`);
-			} else {
-				alert('An unexpected error occurred while searching for rides');
-			}
-		} finally {
-			setSearchingRides(false);
-		}
-	};
-
-	const toggleRideExpansion = (rideId: string) => {
-		setExpandedRides((prev) => ({
-			...prev,
-			[rideId]: !prev[rideId],
-		}));
-	};
-
-	const handleJoinRide = async (rideId: string, ride: Ride) => {
-		try {
-			// TODO: Implement join ride API call
-			console.log('Joining ride:', rideId, 'with seats:', seats);
-			alert(`Requesting to join ride to ${ride.endLocation}`);
-		} catch (error) {
-			console.error('Error joining ride:', error);
-			alert('Failed to join ride. Please try again.');
-		}
-	};
-
-	const formatTime = (dateString: string) => {
-		return new Date(dateString).toLocaleTimeString('en-US', {
-			hour: 'numeric',
-			minute: '2-digit',
-			hour12: true,
-		});
-	};
-
-	const calculateDistance = (coords: number[]) => {
-		if (!coords || coords.length < 2) return 'Unknown';
-		// You can implement actual distance calculation here if needed
-		return `${Math.round(Math.random() * 10 + 1)} km`;
-	};
+	const [rideIds, setRideIds] = useState<string[]>([]);
 
 	const forwardGeocoding = async (
 		searchQuery: string,
 		inputType: 'pickup' | 'dropoff'
 	) => {
-		setLoading(true); // Start loading before the conditional check
+		setLoading(true);
 
 		try {
 			const response = await axios.get(
@@ -308,6 +224,80 @@ export default function ToAndFrom() {
 			setDropoffGeocodeResults([]);
 			setActiveInput(null);
 		}
+	};
+
+	const handleRideSearch = async () => {
+		// Validate required fields
+		if (!pickupQuery && !locationAName) {
+			alert('Please select a pickup location');
+			return;
+		}
+
+		if (!dropoffQuery && !locationBName) {
+			alert('Please select a dropoff location');
+			return;
+		}
+
+		setSearchingRides(true);
+		try {
+			const requestBody = {
+				pickupQuery: pickupQuery || locationAName,
+				dropoffQuery: dropoffQuery || locationBName,
+				departureTime:
+					selectedDate === 'today'
+						? new Date().toISOString()
+						: new Date(
+								Date.now() + 24 * 60 * 60 * 1000
+							).toISOString(),
+				markerOrigin: markerOrigin,
+				markerDestination: markerDestination,
+				proximityRadius: 5, // 5km default radius
+				seats: Number.parseInt(seats),
+			};
+
+			console.log('Searching rides with params:', requestBody);
+
+			const response = await axios.post('/api/find-ride', requestBody, {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+
+			const data: RideSearchResult = response.data;
+			setRideResults(data);
+
+			console.log('Ride search results:', data);
+
+			// Extract ride IDs from the results
+			const extractedRideIds = data.rides.map((ride) => ride.id);
+			setRideIds(extractedRideIds);
+
+			console.log('Extracted ride IDs:', extractedRideIds);
+
+			if (data.success) {
+				setShowResults(true);
+			} else {
+				alert('No rides found for your search criteria');
+			}
+		} catch (error) {
+			console.error('Error searching for rides:', error);
+
+			if (axios.isAxiosError(error)) {
+				const errorMessage =
+					error.response?.data?.error || 'Failed to search for rides';
+				alert(`Error: ${errorMessage}`);
+			} else {
+				alert('An unexpected error occurred while searching for rides');
+			}
+		} finally {
+			setSearchingRides(false);
+		}
+	};
+
+	const handleJoinRideFromDetail = (rideId: string, seats: number) => {
+		console.log(`Ride ${rideId} joined with ${seats} seats`);
+		// You can add any additional logic here after a ride is joined
+		toast.success(`Successfully joined ride ${rideId}!`);
 	};
 
 	return (
@@ -475,22 +465,25 @@ export default function ToAndFrom() {
 				</Button>
 			</div>
 
-			{/* Results Section */}
-			{showResults && rideResults && rideResults.success && (
+			{/* Results Section - Using RideDetailComponent */}
+			{showResults && rideIds.length > 0 && (
 				<div className="border-t pt-6">
 					<div className="flex items-center justify-between px-6 pb-4">
 						<h2 className="text-2xl font-bold">Available Rides</h2>
 						<Button
 							variant="outline"
-							onClick={() => setShowResults(false)}
+							onClick={() => {
+								setShowResults(false);
+								setRideIds([]);
+							}}
 							className="text-sm"
 						>
 							Clear Results
 						</Button>
 					</div>
-					<ChooseRide
-						rides={rideResults.rides}
-						onJoinRide={handleJoinRide}
+					<RideDetailComponent
+						rideIds={rideIds}
+						onJoinRide={handleJoinRideFromDetail}
 					/>
 				</div>
 			)}

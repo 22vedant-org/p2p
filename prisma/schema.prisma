@@ -25,6 +25,7 @@ model User {
   companyName     String?
   banned          Boolean?       @default(false)
   bio             String?
+  twoFactorEnabled  Boolean?
   // banExpiration   Int?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -105,13 +106,16 @@ model Ride {
   endLocationCoord  Float[]
   departureTime   String
   availableSeats  Int
-  // pricePerSeat    Float
+  pricePerSeat    Float?
   initialDeposit   Float
   rideBio         String?
   polyLineCoords  Json
   totalDistance   Int
   status          RideStatus    @default(AVAILABLE)
-  smartContractAddress  String? 
+  escrowAddress  String? 
+  rideId         BigInt?
+  driverPublicKey String?
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 

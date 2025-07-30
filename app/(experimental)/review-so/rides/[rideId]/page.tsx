@@ -49,7 +49,7 @@ export default function RidePage() {
 
 	if (!rideId) {
 		return (
-			<div className="min-h-screen bg-gray-100 flex items-center justify-center">
+			<div className="min-h-screen flex items-center justify-center">
 				<div className="text-red-500 text-xl">Invalid ride ID</div>
 			</div>
 		);

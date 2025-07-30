@@ -3,21 +3,13 @@ import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 
-async function fetchSolInrPrice(): Promise<number> {
-	try {
-		const response = await fetch(
-			'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=inr',
-			{ cache: 'no-store' }
-		);
-		if (!response.ok) {
-			throw new Error('Failed to fetch SOL/INR price');
-		}
-		const data = await response.json();
-		return data.solana.inr;
-	} catch (error) {
-		console.error('Error fetching SOL/INR price:', error);
-		throw new Error('Unable to fetch cryptocurrency price');
-	}
+// Helper function to convert BigInt to string for JSON serialization
+function serializeBigInt(obj: any): any {
+	return JSON.parse(
+		JSON.stringify(obj, (key, value) =>
+			typeof value === 'bigint' ? value.toString() : value
+		)
+	);
 }
 
 export async function POST(req: NextRequest) {
@@ -51,6 +43,9 @@ export async function POST(req: NextRequest) {
 			rideBio,
 			polyLineCoords,
 			totalDistance,
+			rideId,
+			escrowAddress,
+			driverPublicKey,
 		} = body || {};
 
 		// ✅ Validate required fields with better error messages
@@ -67,6 +62,9 @@ export async function POST(req: NextRequest) {
 		if (!availableSeats) missingFields.push('availableSeats');
 		if (!rideBio) missingFields.push('rideBio');
 		if (!totalDistance) missingFields.push('totalDistance');
+		if (!rideId) missingFields.push('rideId');
+		if (!escrowAddress) missingFields.push('escrowAddress');
+		if (!driverPublicKey) missingFields.push('driverPublicKey');
 
 		// ✅ Validate marker coordinates with detailed checks
 		if (!markerOrigin || typeof markerOrigin !== 'object') {
@@ -115,25 +113,6 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const depositInInr = Number(initialDeposit);
-		if (isNaN(depositInInr) || depositInInr <= 0) {
-			return NextResponse.json(
-				{ error: 'Invalid initial deposit amount' },
-				{ status: 400 }
-			);
-		}
-
-		let depositInSol: number;
-		try {
-			const solInrPrice = await fetchSolInrPrice();
-			depositInSol = depositInInr / solInrPrice;
-		} catch (error) {
-			return NextResponse.json(
-				{ error: 'Failed to convert INR to SOL' },
-				{ status: 500 }
-			);
-		}
-
 		// ✅ Create the ride in the database with proper coordinate arrays
 		const ride = await prisma.ride.create({
 			data: {
@@ -146,18 +125,24 @@ export async function POST(req: NextRequest) {
 				],
 				departureTime: parsedDepartureTime.toString(),
 				availableSeats: Number(availableSeats) || 1,
-				initialDeposit: depositInSol,
+				initialDeposit: initialDeposit,
 				polyLineCoords: polyLineCoords || [],
 				totalDistance,
 				driverId,
 				rideBio,
+				rideId,
+				escrowAddress,
+				driverPublicKey,
 			},
 		});
+
+		// ✅ Serialize the ride object to handle BigInt values
+		const serializedRide = serializeBigInt(ride);
 
 		return NextResponse.json(
 			{
 				message: 'Ride created successfully',
-				ride,
+				ride: serializedRide,
 			},
 			{ status: 201 }
 		);

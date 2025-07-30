@@ -106,7 +106,25 @@ export async function POST(req: NextRequest) {
 					},
 				],
 			},
-			include: {
+			select: {
+				id: true,
+				rideId: true, // ✅ Include rideId in the selection
+				startLocation: true,
+				startLocationCoord: true,
+				endLocation: true,
+				endLocationCoord: true,
+				departureTime: true,
+				availableSeats: true,
+				pricePerSeat: true,
+				initialDeposit: true,
+				rideBio: true,
+				polyLineCoords: true,
+				totalDistance: true,
+				status: true,
+				escrowAddress: true,
+				driverPublicKey: true,
+				createdAt: true,
+				updatedAt: true,
 				driver: {
 					select: {
 						id: true,
@@ -168,10 +186,20 @@ export async function POST(req: NextRequest) {
 					.sort((a, b) => a.distanceFromUser - b.distanceFromUser);
 			}
 		}
+
+		// ✅ Handle BigInt serialization for JSON response - Convert each ride properly
+		const serializedRides = filteredRides.map((ride) => {
+			// Create a new object with BigInt converted to string
+			return {
+				...ride,
+				rideId: ride.rideId ? ride.rideId.toString() : null,
+			};
+		});
+
 		return NextResponse.json({
 			success: true,
-			rides: filteredRides,
-			totalRides: filteredRides.length,
+			rides: serializedRides,
+			totalRides: serializedRides.length,
 			proximitySearch:
 				markerOrigin &&
 				markerOrigin.lat !== undefined &&
