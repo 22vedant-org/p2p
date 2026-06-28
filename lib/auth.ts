@@ -1,10 +1,7 @@
 import { betterAuth, BetterAuthOptions } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { openAPI } from 'better-auth/plugins';
-// import { sendEmail } from '@/app/actions/email';
 import { sendEmail } from '@/app/actions/resend-email';
-import { Resend } from 'resend';
-import { PrismaClient } from '@prisma/client';
 import prisma from './prisma';
 
 // const resend = new Resend(process.env.RESEND_API_KEY);

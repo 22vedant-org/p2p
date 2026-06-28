@@ -15,38 +15,38 @@ export default async function authMiddleware(request: NextRequest) {
 	const isAdminRoute = adminRoutes.includes(pathName);
 	const isPublicRoute = publicRoutes.includes(pathName);
 
-	const { data: session } = await betterFetch<Session>(
-		'/api/auth/get-session',
-		{
-			baseURL: process.env.BETTER_AUTH_URL,
-			headers: {
-				//get the cookie from the request
-				cookie: request.headers.get('cookie') || '',
-			},
-		}
-	);
+	// const { data: session } = await betterFetch<Session>(
+	// 	'/api/auth/get-session',
+	// 	{
+	// 		baseURL: process.env.BETTER_AUTH_URL,
+	// 		headers: {
+	// 			//get the cookie from the request
+	// 			cookie: request.headers.get('cookie') || '',
+	// 		},
+	// 	}
+	// );
 
-	if (!session) {
-		if (isAuthRoute || isPasswordRoute || isPublicRoute) {
-			return NextResponse.next();
-		}
+	// if (!session) {
+	// 	if (isAuthRoute || isPasswordRoute || isPublicRoute) {
+	// 		return NextResponse.next();
+	// 	}
 
-		const currentPath = new URL(request.url).pathname;
+	// 	const currentPath = new URL(request.url).pathname;
 
-		if (pathName === '/' && currentPath !== '/landing') {
-			return NextResponse.redirect(new URL('/landing', request.url));
-		} else if (pathName !== currentPath) {
-			return NextResponse.redirect(new URL(pathName, request.url));
-		}
-	}
+	// 	if (pathName === '/' && currentPath !== '/landing') {
+	// 		return NextResponse.redirect(new URL('/landing', request.url));
+	// 	} else if (pathName !== currentPath) {
+	// 		return NextResponse.redirect(new URL(pathName, request.url));
+	// 	}
+	// }
 
 	if (isAuthRoute || isPasswordRoute) {
 		return NextResponse.redirect(new URL('/', request.url));
 	}
 
-	if (isAdminRoute && session?.user.role !== 'admin') {
-		return NextResponse.redirect(new URL('/', request.url));
-	}
+	// if (isAdminRoute && session?.user.role !== 'admin') {
+	// 	return NextResponse.redirect(new URL('/', request.url));
+	// }
 
 	return NextResponse.next();
 }

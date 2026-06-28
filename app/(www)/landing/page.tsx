@@ -7,6 +7,7 @@ import { AuroraText } from '@/components/magicui/aurora-text';
 import Image from 'next/image';
 import FeaturesGrid from './_components/features';
 import Link from 'next/link';
+import { BentoDemo } from './_components/bento-grid';
 
 export default function HeavyAILanding() {
 	return (
@@ -218,7 +219,8 @@ export default function HeavyAILanding() {
 				</div>
 			</main>
 
-			<FeaturesGrid />
+			{/* <FeaturesGrid /> */}
+			<BentoDemo />
 		</div>
 	);
 }

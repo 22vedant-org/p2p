@@ -7,6 +7,7 @@ import {
 	Marker,
 	GeoJSONSource,
 	NavigationControl,
+	LngLatBounds,
 } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import axios from 'axios';
@@ -15,6 +16,7 @@ import { Feature, LineString } from 'geojson';
 import { useMarkerPositionsStore } from '@/hooks/store/useLocation';
 import { usePlaceStore } from '@/hooks/store/usePlace';
 import { usePolyLineStore } from '@/hooks/store/usePolyLineCoords';
+
 const OlaMaplibre = () => {
 	const mapRef = useRef<HTMLDivElement>(null);
 	const mapInstance = useRef<Map | null>(null); // Reference to the map instance
@@ -28,12 +30,6 @@ const OlaMaplibre = () => {
 	} = useMarkerPositionsStore();
 	const { setLocationA, setLocationB } = usePlaceStore();
 	const { polyCords, setPolyCords } = usePolyLineStore();
-	// const [markerPositions, setMarkerPositions] = useState({
-	// 	markerOrigin: { lng: 73.847466, lat: 18.530823 },
-	// 	markerDestination: { lng: 73.8547, lat: 18.4655 },
-	// });
-
-	// const [polyCords, setPolyCords] = useState<[number, number][]>([]);
 
 	const sendParamsOla = useCallback(async () => {
 		try {
@@ -84,6 +80,7 @@ const OlaMaplibre = () => {
 			console.log(error);
 		}
 	}, []);
+
 	const reverseGeocodeMarkerDestination = useCallback(async (marker) => {
 		try {
 			const response = await axios.get(
@@ -108,6 +105,29 @@ const OlaMaplibre = () => {
 			console.log(error);
 		}
 	}, []);
+
+	// Function to fit map bounds to both markers
+	const fitMapToBounds = useCallback(() => {
+		if (!mapInstance.current) return;
+
+		const myMap = mapInstance.current;
+		const bounds = new LngLatBounds();
+
+		// Add both marker positions to bounds
+		bounds.extend([markerOrigin.lng, markerOrigin.lat]);
+		bounds.extend([markerDestination.lng, markerDestination.lat]);
+
+		// Fit the map to the bounds with some padding
+		myMap.fitBounds(bounds, {
+			padding: {
+				top: 50,
+				bottom: 50,
+				left: 50,
+				right: 50,
+			},
+			maxZoom: 15, // Prevent zooming in too much
+		});
+	}, [markerOrigin, markerDestination]);
 
 	useEffect(() => {
 		sendParamsOla();
@@ -135,8 +155,6 @@ const OlaMaplibre = () => {
 				return { url, resourceType };
 			},
 		});
-
-		// myMap.scrollZoom.disable();
 
 		myMap.addControl(
 			new NavigationControl({
@@ -172,6 +190,7 @@ const OlaMaplibre = () => {
 			setMarkerOrigin({ lng: lngLat.lng, lat: lngLat.lat });
 			reverseGeocodeMarkerOrigin({ lng: lngLat.lng, lat: lngLat.lat });
 		});
+
 		destinationMarkerRef.current.on('dragend', () => {
 			const lngLat = destinationMarkerRef.current!.getLngLat();
 			setMarkerDestination({ lng: lngLat.lng, lat: lngLat.lat });
@@ -191,25 +210,34 @@ const OlaMaplibre = () => {
 		// Ensure we wait for the style to load before adding layers
 		myMap.on('style.load', () => {
 			console.log('Style loaded successfully.');
+			// Fit bounds after style loads and markers are positioned
+			setTimeout(fitMapToBounds, 100);
 		});
-	}, [markerOrigin, markerDestination]);
+	}, [markerOrigin, markerDestination, fitMapToBounds]);
 
+	// Update origin marker position and fit bounds when markerOrigin changes
 	useEffect(() => {
 		if (originMarkerRef.current) {
 			originMarkerRef.current.setLngLat([
 				markerOrigin.lng,
 				markerOrigin.lat,
 			]);
+			// Fit bounds when marker position changes (e.g., from location search)
+			setTimeout(fitMapToBounds, 100);
 		}
-	}, [markerOrigin]);
+	}, [markerOrigin, fitMapToBounds]);
+
+	// Update destination marker position and fit bounds when markerDestination changes
 	useEffect(() => {
 		if (destinationMarkerRef.current) {
 			destinationMarkerRef.current.setLngLat([
 				markerDestination.lng,
 				markerDestination.lat,
 			]);
+			// Fit bounds when marker position changes (e.g., from location search)
+			setTimeout(fitMapToBounds, 100);
 		}
-	}, [markerDestination]);
+	}, [markerDestination, fitMapToBounds]);
 
 	// Update the polyline when `polyCords` changes
 	useEffect(() => {
